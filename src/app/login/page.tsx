@@ -25,10 +25,8 @@ export default function LoginPage() {
     
     setAuthUrl(generatedAuthUrl);
     
-    // Give a moment for the user to see the debug info before redirecting
-    setTimeout(() => {
-      window.location.href = generatedAuthUrl;
-    }, 5000);
+    // Redirect immediately
+    window.location.href = generatedAuthUrl;
   };
 
   return (
@@ -48,7 +46,7 @@ export default function LoginPage() {
               <pre className="text-xs bg-gray-800 text-white p-2 rounded-md break-words whitespace-pre-wrap">
                 <code>{authUrl}</code>
               </pre>
-              <p className="mt-2 text-sm text-muted-foreground">You will be redirected in 5 seconds...</p>
+              <p className="mt-2 text-sm text-muted-foreground">Redirecting...</p>
             </div>
           )}
       </div>
