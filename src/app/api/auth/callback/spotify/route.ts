@@ -16,7 +16,8 @@ export async function GET(req: NextRequest) {
 
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-  const redirectUri = 'http://127.0.0.1:9002/api/auth/callback/spotify';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9002';
+  const redirectUri = `${appUrl}/api/auth/callback/spotify`;
 
   if (!clientId || !clientSecret) {
     throw new Error('Spotify credentials are not set in the environment variables.');
@@ -46,12 +47,16 @@ export async function GET(req: NextRequest) {
     } 
 
     const accessToken = responseData.access_token;
-    const redirectURL = new URL('/', req.url);
+    // Redirect to the root of the app URL
+    const redirectURL = new URL('/', appUrl);
     redirectURL.searchParams.set('access_token', accessToken);
     
     return NextResponse.redirect(redirectURL);
 
   } catch (e: any) {
-    return NextResponse.redirect(new URL(`/?error=${encodeURIComponent(e.message)}`, req.url));
+    // Redirect to the root of the app URL with an error
+    const errorURL = new URL('/', appUrl);
+    errorURL.searchParams.set('error', encodeURIComponent(e.message));
+    return NextResponse.redirect(errorURL);
   }
 }

@@ -61,7 +61,8 @@ export default function Home() {
   
   const handleLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-    const redirectUri = "http://127.0.0.1:9002/api/auth/callback/spotify";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9002';
+    const redirectUri = `${appUrl}/api/auth/callback/spotify`;
     const scopes = "user-read-private user-read-email playlist-read-private playlist-read-collaborative";
     const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}`;
     window.location.href = authUrl;
