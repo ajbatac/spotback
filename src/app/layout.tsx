@@ -25,7 +25,7 @@ export default function RootLayout({
         </AuthProvider>
         <Toaster />
         <footer className="text-center p-4 text-sm text-muted-foreground">
-          Created with &lt;3 by <a href="https://www.instagram.com/ajbatac" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">AJ Batac (@ajbatac)</a> - 
+          Created with ❤️ by AJ Batac (<a href="https://www.instagram.com/ajbatac" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">@ajbatac</a>) - 
           <Link href="/changelog" className="underline hover:text-primary">
             v1.0.0
           </Link>
