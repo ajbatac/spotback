@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -19,9 +20,9 @@ export function PlaylistCard({ playlist, isSelected, onSelectionChange }: Playli
     <div
       onClick={() => onSelectionChange(playlist.id)}
       className={cn(
-        "group relative cursor-pointer overflow-hidden rounded-lg bg-background transition-all duration-200",
-        "shadow-neumorphic hover:shadow-neumorphic-lg focus-within:shadow-neumorphic-lg",
-        isSelected && "shadow-neumorphic-inset"
+        "group relative cursor-pointer overflow-hidden rounded-lg bg-card border transition-all duration-200",
+        "hover:shadow-lg hover:-translate-y-1",
+         isSelected && "ring-2 ring-primary"
       )}
     >
       <div className="p-3">
@@ -36,11 +37,11 @@ export function PlaylistCard({ playlist, isSelected, onSelectionChange }: Playli
               data-ai-hint="music album"
             />
           ) : (
-             <div className="flex h-full w-full items-center justify-center bg-muted">
+             <div className="flex h-full w-full items-center justify-center bg-muted rounded-md">
                 <Music className="h-1/3 w-1/3 text-muted-foreground" />
              </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+          <div className={cn("absolute inset-0 bg-gradient-to-t from-black/50 to-transparent", !imageUrl && "hidden")} />
         </div>
         
         <h3 className="font-bold truncate font-headline">{playlist.name}</h3>
@@ -49,9 +50,9 @@ export function PlaylistCard({ playlist, isSelected, onSelectionChange }: Playli
 
       <div 
         className={cn(
-          "absolute top-3 right-3 flex h-6 w-6 items-center justify-center rounded-md border-2 border-transparent bg-background/70 backdrop-blur-sm transition-all duration-200",
-          "shadow-neumorphic-sm group-hover:scale-110",
-          isSelected && "bg-accent text-accent-foreground shadow-neumorphic-inset-sm"
+          "absolute top-3 right-3 flex h-6 w-6 items-center justify-center rounded-md border-2 bg-background/70 backdrop-blur-sm transition-all duration-200",
+          "shadow-sm group-hover:scale-110",
+          isSelected ? "bg-primary border-primary-foreground text-primary-foreground" : "border-transparent"
         )}
       >
         <Checkbox
@@ -66,3 +67,5 @@ export function PlaylistCard({ playlist, isSelected, onSelectionChange }: Playli
     </div>
   );
 }
+
+    

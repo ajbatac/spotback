@@ -1,4 +1,5 @@
 
+
 export interface Paged<T> {
   href: string;
   items: T[];
@@ -19,6 +20,9 @@ export interface SpotifyArtist {
   id: string;
   name: string;
   images?: SpotifyImage[];
+  external_urls: {
+    spotify: string;
+  };
 }
 
 export interface SpotifyAlbum {
@@ -70,3 +74,5 @@ export interface SpotifyUserProfile {
     type: string;
     uri: string;
 }
+
+    

@@ -14,10 +14,13 @@ export function TopArtistCard({ artist }: TopArtistCardProps) {
   const imageUrl = artist.images?.[0]?.url;
 
   return (
-    <div
+    <a
+      href={artist.external_urls.spotify}
+      target="_blank"
+      rel="noopener noreferrer"
       className={cn(
-        "group relative cursor-pointer overflow-hidden rounded-lg bg-background transition-all duration-200",
-        "shadow-neumorphic hover:shadow-neumorphic-lg"
+        "group relative block overflow-hidden rounded-lg bg-card border transition-all duration-200",
+        "hover:shadow-lg hover:-translate-y-1"
       )}
     >
       <div className="relative aspect-square w-full overflow-hidden">
@@ -37,9 +40,11 @@ export function TopArtistCard({ artist }: TopArtistCardProps) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
-      <div className="absolute bottom-0 left-0 p-3">
+      <div className="absolute bottom-0 left-0 p-3 w-full">
         <h3 className="font-bold text-white drop-shadow-md truncate">{artist.name}</h3>
       </div>
-    </div>
+    </a>
   );
 }
+
+    

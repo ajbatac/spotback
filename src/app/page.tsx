@@ -250,8 +250,8 @@ export default function Home() {
               <h1 className="text-4xl font-bold font-headline">SPOTBACK</h1>
               {user && <p className="text-muted-foreground flex items-center gap-2 mt-1"><User size={16}/> {user.display_name}</p>}
             </div>
-            <Button variant="outline" size="sm" onClick={handleLogout}><LogOut /> Logout</Button>
           </div>
+          <Button variant="outline" size="sm" onClick={handleLogout}><LogOut className="mr-2" /> Logout</Button>
         </header>
       
       {error && <p className="mb-4 text-destructive bg-destructive/10 p-4 rounded-md">{error}</p>}
@@ -267,7 +267,7 @@ export default function Home() {
         </div>
       )}
 
-      <div className="mb-8 p-4 bg-muted/50 rounded-lg">
+      <div className="mb-8 p-4 bg-card rounded-lg border">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Step 1: Select Your Playlists</h2>
           <div className="flex items-center gap-2">
@@ -293,7 +293,7 @@ export default function Home() {
       </div>
 
       {selectedCount > 0 && (
-        <div className="mb-8 p-4 bg-muted/50 rounded-lg">
+        <div className="mb-8 p-4 bg-card rounded-lg border">
           <h2 className="text-2xl font-bold mb-4">Step 2: Choose Your Backup Format</h2>
           <div className="flex flex-wrap items-center gap-2">
               <Download className="mr-2 h-5 w-5 text-muted-foreground" />
@@ -320,3 +320,5 @@ export default function Home() {
     </main>
   );
 }
+
+    
