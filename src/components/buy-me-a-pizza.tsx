@@ -3,16 +3,27 @@
 
 import React, { useEffect } from 'react';
 
-const SCRIPT_ID = 'buy-me-a-pizza-script';
-const BUTTON_ID = 'buy-me-a-pizza-button';
+const SCRIPT_ID = 'buy-me-a-coffee-script';
+const CONTAINER_ID = 'buy-me-a-coffee-container';
 
 export function BuyMeAPizza() {
   useEffect(() => {
-    // Check if the script is already on the page to prevent duplicates
-    if (document.getElementById(SCRIPT_ID)) {
+    // Find the container for the button
+    const container = document.getElementById(CONTAINER_ID);
+    if (!container) {
       return;
     }
-    
+
+    // Don't add the script if it's already there
+    if (document.getElementById(SCRIPT_ID)) {
+      // If script exists but button isn't there, maybe it failed to render.
+      // Re-running the init function might help.
+      if (typeof (window as any).BMCWidget !== 'undefined') {
+        (window as any).BMCWidget.init();
+      }
+      return;
+    }
+
     const script = document.createElement('script');
     script.id = SCRIPT_ID;
     script.src = "https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js";
@@ -26,44 +37,52 @@ export function BuyMeAPizza() {
     script.setAttribute('data-outline-color', '#000000');
     script.setAttribute('data-font-color', '#000000');
     script.setAttribute('data-coffee-color', '#ffffff');
-    
-    // Add an onload handler to create the button's anchor tag after the script loads.
+
+    // When the script loads, the library should automatically find the element
+    // with data-name="bmc-button" inside our container and initialize it.
     script.onload = () => {
-      // The script creates a global `BMAC_BUTTON` object. We can check for it.
-      // The script itself should find the data-name="bmc-button" and replace it.
-      // We just need to ensure the anchor tag is there.
-       if (!document.getElementById(BUTTON_ID)) {
-         const anchor = document.createElement('a');
-         anchor.id = BUTTON_ID;
-         anchor.href = "https://www.buymeacoffee.com/emailsig";
-         anchor.className = "bmc-button";
-         // The container div will be replaced by the widget
-         const container = document.getElementById('buy-me-a-pizza-container');
-         if(container) {
-            container.appendChild(anchor);
-         }
+       // The library's script might have an init function to call manually
+       // if it doesn't automatically detect the new element.
+       if (typeof (window as any).BMCWidget !== 'undefined') {
+         (window as any).BMCWidget.init();
        }
     };
+    
+    script.onerror = () => {
+        console.error("Buy Me A Coffee script failed to load.");
+    };
 
+    // The script should find this anchor tag inside our container
+    const anchor = document.createElement('a');
+    anchor.href = "https://www.buymeacoffee.com/emailsig";
+    anchor.className = "bmc-button"; // The script looks for this class
+    
+    // Clear the container and add the new anchor
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+    container.appendChild(anchor);
+
+    // Add the script to the body
     document.body.appendChild(script);
 
     return () => {
-      // Cleanup: remove the script and any created button when the component unmounts
+      // Cleanup: remove the script and widget when the component unmounts
       const existingScript = document.getElementById(SCRIPT_ID);
       if (existingScript) {
         document.body.removeChild(existingScript);
       }
-      // The widget might create other elements, which are harder to track.
-      // A simple container removal is cleanest.
-      const container = document.getElementById('buy-me-a-pizza-container');
-      if (container) {
-          while (container.firstChild) {
-              container.removeChild(container.firstChild);
-          }
+      // Also remove any widgets it might have created
+      const bmcWidget = document.querySelector('.bmc-widget');
+      if (bmcWidget && bmcWidget.parentElement) {
+          bmcWidget.parentElement.removeChild(bmcWidget);
+      }
+       while (container.firstChild) {
+          container.removeChild(container.firstChild);
       }
     };
-  }, []);
+  }, []); // The empty dependency array ensures this runs only once on mount.
 
-  // This div is the target for our script.
-  return <div id="buy-me-a-pizza-container"></div>;
+  // This div is the target container for our script to place the button.
+  return <div id={CONTAINER_ID}></div>;
 }
