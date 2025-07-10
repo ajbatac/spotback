@@ -127,10 +127,17 @@ export default function Home() {
     }
   }
 
-  const handleExport = async (format: 'json' | 'csv' | 'zip') => {
+  const handleExport = async (format: 'json' | 'csv' | 'zip' | 'official-json') => {
     try {
       const fullPlaylistsData = await fetchFullPlaylists();
 
+      if (format === 'official-json') {
+          const dataStr = JSON.stringify({ playlists: fullPlaylistsData }, null, 2);
+          const blob = new Blob([dataStr], { type: "application/json" });
+          triggerDownload(blob, "spotify_playlists_official.json");
+          return;
+      }
+      
       if (format === 'json') {
         const dataStr = JSON.stringify(fullPlaylistsData, null, 2);
         const blob = new Blob([dataStr], { type: "application/json" });
@@ -240,14 +247,20 @@ export default function Home() {
                     <span>Export as</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
+                    <DropdownMenuLabel>Custom Formats</DropdownMenuLabel>
                     <DropdownMenuItem onClick={() => handleExport('json')}>
-                      <FileJson className="mr-2 h-4 w-4" /> JSON
+                      <FileJson className="mr-2 h-4 w-4" /> Simplified JSON
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleExport('csv')}>
                       <FileText className="mr-2 h-4 w-4" /> CSV
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleExport('zip')}>
                       <FileArchive className="mr-2 h-4 w-4" /> ZIP (of CSVs)
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Official Formats</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={() => handleExport('official-json')}>
+                      <FileJson className="mr-2 h-4 w-4" /> Spotify API Format
                     </DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>

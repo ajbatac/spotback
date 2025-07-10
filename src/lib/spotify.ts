@@ -48,13 +48,21 @@ export async function getPlaylistsForUser(userId: string, token: string): Promis
 }
 
 export async function getPlaylistWithAllTracks(playlistId: string, token: string): Promise<SpotifyPlaylist> {
-    const playlistInfo: SpotifyPlaylist = await fetchSpotify(`${SPOTIFY_API_BASE}/playlists/${playlistId}?fields=id,name,description,images,tracks.total`, {
+    // Fetch the full playlist object first.
+    // The `fields` parameter can be used to control the response size, but for official format we want everything.
+    const playlistInfo: SpotifyPlaylist = await fetchSpotify(`${SPOTIFY_API_BASE}/playlists/${playlistId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
 
     let tracks: { track: SpotifyTrack }[] = [];
-    let url: string | null = `${SPOTIFY_API_BASE}/playlists/${playlistId}/tracks?fields=items(track(id,name,artists(name),album(name))),next&limit=100`;
+    // Start with the initial track list from the playlist object
+    if (playlistInfo.tracks && playlistInfo.tracks.items) {
+        tracks = tracks.concat(playlistInfo.tracks.items.filter(item => item.track));
+    }
     
+    let url: string | null = playlistInfo.tracks.next;
+    
+    // Paginate through the rest of the tracks if they exist
     while(url) {
         const data: Paged<{ track: SpotifyTrack }> = await fetchSpotify(url, {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -67,6 +75,11 @@ export async function getPlaylistWithAllTracks(playlistId: string, token: string
         }
     }
 
-    playlistInfo.tracks = { ...playlistInfo.tracks, items: tracks, total: tracks.length };
+    // Replace the original paginated track list with the full one.
+    playlistInfo.tracks.items = tracks;
+    playlistInfo.tracks.total = tracks.length;
+    // We set `next` to null because we have fetched all pages.
+    playlistInfo.tracks.next = null; 
+
     return playlistInfo;
 }
