@@ -10,9 +10,6 @@ export function BuyMeAPizza() {
   useEffect(() => {
     // Check if the script is already on the page to prevent duplicates
     if (document.getElementById(SCRIPT_ID)) {
-      // If the script exists but the button doesn't, it means we might need to re-init
-      // The easiest way is to let the script handle it, but sometimes we need to nudge it.
-      // For now, we assume if script exists, it's handling things.
       return;
     }
     
