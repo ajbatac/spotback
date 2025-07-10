@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/context/auth-context';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'SpotBack - Backup Your Spotify Playlist',
@@ -16,11 +17,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-background text-foreground">
+      <body className="bg-background text-foreground flex flex-col min-h-screen">
         <AuthProvider>
-          {children}
+          <div className="flex-grow">
+            {children}
+          </div>
         </AuthProvider>
         <Toaster />
+        <footer className="text-center p-4 text-sm text-muted-foreground">
+          Created with &lt;3 by <a href="https://www.instagram.com/ajbatac" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">AJ Batac (@ajbatac)</a> - 
+          <Link href="/changelog" className="underline hover:text-primary">
+            v1.0.0
+          </Link>
+        </footer>
       </body>
     </html>
   );
