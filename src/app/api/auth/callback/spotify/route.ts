@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
     return createDebugResponse(debugInfo);
   }
 
-  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+  const clientId = process.env.SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
   const redirectUri = 'http://127.0.0.1:9002/api/auth/callback/spotify';
 
