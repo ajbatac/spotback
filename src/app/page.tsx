@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
+import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { getPlaylistsForUser, getUserProfile, getPlaylistWithAllTracks, getTopArtists } from '@/lib/spotify';
@@ -230,6 +231,7 @@ export default function Home() {
   if (!token) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background p-4 text-center">
+        <Image src="/spotify.png" alt="SpotBack Logo" width={80} height={80} className="mb-4" />
         <h1 className="text-5xl font-extrabold tracking-tight font-headline mb-4">Backup Your Spotify Playlists</h1>
         <p className="text-lg text-muted-foreground mb-8 max-w-xl">
           Never lose your curated music collections again. With SPOTBACK, you can easily save your playlists in various formats, including CSV, JSON, and the official Spotify format for easy transfer.
@@ -246,6 +248,7 @@ export default function Home() {
     <main className="container mx-auto p-4 md:p-8">
        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div className="flex items-center gap-4">
+            <Image src="/spotify.png" alt="SpotBack Logo" width={50} height={50} />
             <div>
               <h1 className="text-4xl font-bold font-headline">SPOTBACK</h1>
               {user && <p className="text-muted-foreground flex items-center gap-2 mt-1"><User size={16}/> {user.display_name}</p>}
@@ -320,5 +323,3 @@ export default function Home() {
     </main>
   );
 }
-
-    
