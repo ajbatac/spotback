@@ -251,9 +251,8 @@ export default function Home() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Step 1: Select Your Playlists</h2>
           <div className="flex items-center gap-2">
-              <div className="text-sm text-muted-foreground text-right">
-                  <p>{selectedCount} playlist{selectedCount !== 1 ? 's' : ''} selected</p>
-                  <p>of {playlists.length} total</p>
+              <div className="text-sm text-muted-foreground">
+                  {selectedCount} of {playlists.length} selected
               </div>
               <Button variant="outline" onClick={handleSelectAll}>
                 {allSelected ? 'Deselect All' : 'Select All'}
