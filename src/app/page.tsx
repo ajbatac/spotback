@@ -7,19 +7,8 @@ import { Button } from '@/components/ui/button';
 import { getPlaylistsForUser, getUserProfile, getPlaylistWithAllTracks } from '@/lib/spotify';
 import type { SpotifyPlaylist, SpotifyTrack, SpotifyUserProfile } from '@/types/spotify';
 import { PlaylistCard } from '@/components/playlist-card';
-import { Loader2, LogIn, User, ChevronDown, Download, FileJson, FileText, FileArchive } from 'lucide-react';
+import { Loader2, LogIn, User, Download, FileJson, FileText, FileArchive } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import JSZip from 'jszip';
 
 export default function Home() {
@@ -30,7 +19,7 @@ export default function Home() {
   const [user, setUser] = useState<SpotifyUserProfile | null>(null);
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isExporting, setIsExporting] = useState(false);
+  const [isExporting, setIsExporting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedPlaylists, setSelectedPlaylists] = useState<Set<string>>(new Set());
 
@@ -116,9 +105,9 @@ export default function Home() {
   const selectedCount = useMemo(() => selectedPlaylists.size, [selectedPlaylists]);
   const allSelected = useMemo(() => selectedCount > 0 && selectedCount === playlists.length, [selectedCount, playlists.length]);
 
-  const fetchFullPlaylists = async (): Promise<SpotifyPlaylist[]> => {
+  const fetchFullPlaylists = async (exportType: string): Promise<SpotifyPlaylist[]> => {
     if (!token) throw new Error("Authentication token is not available.");
-    setIsExporting(true);
+    setIsExporting(exportType);
     try {
       const selectedArr = Array.from(selectedPlaylists);
       const fullPlaylists = await Promise.all(
@@ -126,30 +115,40 @@ export default function Home() {
       );
       return fullPlaylists;
     } finally {
-      setIsExporting(false);
+      setIsExporting(null);
     }
   }
 
   const handleExport = async (format: 'json' | 'csv' | 'zip' | 'official-json') => {
     try {
       setError(null);
-      const fullPlaylistsData = await fetchFullPlaylists();
+      const fullPlaylistsData = await fetchFullPlaylists(format);
 
       if (format === 'official-json') {
           const dataStr = JSON.stringify({ playlists: fullPlaylistsData }, null, 2);
           const blob = new Blob([dataStr], { type: "application/json" });
-          triggerDownload(blob, "spotify_playlists_official.json");
+          triggerDownload(blob, "spotback_official_playlists.json");
           return;
       }
       
       if (format === 'json') {
-        const dataStr = JSON.stringify(fullPlaylistsData, null, 2);
+        const simplifiedData = fullPlaylistsData.map(p => ({
+            name: p.name,
+            description: p.description,
+            owner: p.owner.display_name,
+            tracks: p.tracks.items?.map(item => item.track ? ({
+                name: item.track.name,
+                artists: item.track.artists.map(a => a.name).join(', '),
+                album: item.track.album.name
+            }) : null).filter(Boolean)
+        }));
+        const dataStr = JSON.stringify(simplifiedData, null, 2);
         const blob = new Blob([dataStr], { type: "application/json" });
-        triggerDownload(blob, "playlists.json");
+        triggerDownload(blob, "spotback_playlists.json");
       } else if (format === 'csv') {
         const csvContent = convertToCsv(fullPlaylistsData);
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        triggerDownload(blob, "playlists.csv");
+        triggerDownload(blob, "spotback_playlists.csv");
       } else if (format === 'zip') {
         const zip = new JSZip();
         fullPlaylistsData.forEach(playlist => {
@@ -158,7 +157,7 @@ export default function Home() {
           zip.file(`${safeName}.csv`, csvContent);
         });
         const zipBlob = await zip.generateAsync({ type: "blob" });
-        triggerDownload(zipBlob, "playlists.zip");
+        triggerDownload(zipBlob, "spotback_playlists.zip");
       }
     } catch (e: any) {
       if (e.status === 429) {
@@ -213,8 +212,8 @@ export default function Home() {
   if (!token) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background p-4 text-center">
-        <h1 className="text-4xl font-bold font-headline mb-2">Welcome to Playlist Organizer</h1>
-        <p className="text-lg text-muted-foreground mb-6 max-w-md">Please log in with your Spotify account to view and organize your playlists.</p>
+        <h1 className="text-4xl font-bold font-headline mb-2">Welcome to SPOTBACK</h1>
+        <p className="text-lg text-muted-foreground mb-6 max-w-md">Please log in with your Spotify account to view and back up your playlists.</p>
         {error && <p className="mb-4 text-destructive">{error}</p>}
         <Button size="lg" onClick={handleLogin}>
           <LogIn className="mr-2" /> Login with Spotify
@@ -225,57 +224,42 @@ export default function Home() {
 
   return (
     <main className="container mx-auto p-4 md:p-8">
-       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
           <div>
-            <h1 className="text-4xl font-bold font-headline">Your Playlists</h1>
+            <h1 className="text-4xl font-bold font-headline">SPOTBACK</h1>
             {user && <p className="text-muted-foreground flex items-center gap-2 mt-1"><User size={16}/> {user.display_name} ({user.id})</p>}
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-muted-foreground text-right">
-              <p>{selectedCount} playlist{selectedCount !== 1 ? 's' : ''} selected</p>
-              <p>of {playlists.length} total</p>
-            </div>
+          <div className="flex items-center gap-2">
+             <div className="text-sm text-muted-foreground text-right mr-2">
+                <p>{selectedCount} playlist{selectedCount !== 1 ? 's' : ''} selected</p>
+                <p>of {playlists.length} total</p>
+             </div>
             <Button variant="outline" onClick={handleSelectAll}>
               {allSelected ? 'Deselect All' : 'Select All'}
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button disabled={selectedCount === 0}>
-                  Actions <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem disabled>
-                  Organize Selected
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-                    <span>Export as</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuLabel>Custom Formats</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => handleExport('json')}>
-                      <FileJson className="mr-2 h-4 w-4" /> Simplified JSON
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExport('csv')}>
-                      <FileText className="mr-2 h-4 w-4" /> CSV
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExport('zip')}>
-                      <FileArchive className="mr-2 h-4 w-4" /> ZIP (of CSVs)
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Official Formats</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => handleExport('official-json')}>
-                      <FileJson className="mr-2 h-4 w-4" /> Spotify API Format
-                    </DropdownMenuItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </header>
+
+        <div className="flex flex-wrap items-center gap-2 mb-8 p-4 bg-muted/50 rounded-lg">
+            <Download className="mr-2 h-5 w-5 text-muted-foreground" />
+            <span className="font-medium mr-2">Backup Options:</span>
+            <Button size="sm" onClick={() => handleExport('csv')} disabled={selectedCount === 0 || !!isExporting}>
+              {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileText />}
+              Export as CSV
+            </Button>
+            <Button size="sm" onClick={() => handleExport('zip')} disabled={selectedCount === 0 || !!isExporting}>
+              {isExporting === 'zip' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileArchive />}
+              Export as ZIP
+            </Button>
+            <Button size="sm" onClick={() => handleExport('json')} disabled={selectedCount === 0 || !!isExporting}>
+              {isExporting === 'json' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileJson />}
+              Export as JSON
+            </Button>
+             <Button size="sm" variant="secondary" onClick={() => handleExport('official-json')} disabled={selectedCount === 0 || !!isExporting}>
+              {isExporting === 'official-json' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileJson />}
+              Spotify API Format
+            </Button>
+        </div>
 
       {error && <p className="mb-4 text-destructive bg-destructive/10 p-4 rounded-md">{error}</p>}
       
