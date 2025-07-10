@@ -10,6 +10,7 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+    // This MUST exactly match the URI registered in your Spotify Developer Dashboard.
     const redirectUri = 'https://localhost:9002/api/auth/callback/spotify';
     const scopes = [
       'user-read-private',
@@ -17,11 +18,16 @@ export default function LoginPage() {
       'playlist-read-private',
       'playlist-read-collaborative',
     ];
-    const generatedAuthUrl = `https://accounts.spotify.com/authorize?` +
-      `response_type=code` +
-      `&client_id=${clientId}` +
-      `&scope=${scopes.join('%20')}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}`;
+    
+    // Construct the URL ensuring all parts are correct.
+    const params = new URLSearchParams({
+        response_type: 'code',
+        client_id: clientId || '',
+        scope: scopes.join(' '),
+        redirect_uri: redirectUri,
+    });
+
+    const generatedAuthUrl = `https://accounts.spotify.com/authorize?${params.toString()}`;
     
     setAuthUrl(generatedAuthUrl);
     
@@ -39,14 +45,18 @@ export default function LoginPage() {
               <LogIn className="h-5 w-5 mr-3" />
               {authUrl ? 'Redirecting...' : 'Login with Spotify'}
           </Button>
-          {authUrl && (
+          {process.env.NODE_ENV === 'development' && (
             <div className="mt-8 p-4 bg-muted rounded-md text-left w-full">
               <h2 className="text-lg font-bold mb-2">Debug Information</h2>
-              <p className="font-semibold">Generated Authorization URL:</p>
+              <p className="font-semibold">NEXT_PUBLIC_SPOTIFY_CLIENT_ID:</p>
               <pre className="text-xs bg-gray-800 text-white p-2 rounded-md break-words whitespace-pre-wrap">
-                <code>{authUrl}</code>
+                <code>{process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || 'Not Found!'}</code>
               </pre>
-              <p className="mt-2 text-sm text-muted-foreground">Redirecting...</p>
+              <p className="font-semibold mt-2">Generated Authorization URL:</p>
+              <pre className="text-xs bg-gray-800 text-white p-2 rounded-md break-words whitespace-pre-wrap">
+                <code>{authUrl ? authUrl : 'Click button to generate...'}</code>
+              </pre>
+              {authUrl && <p className="mt-2 text-sm text-muted-foreground">Redirecting...</p>}
             </div>
           )}
       </div>

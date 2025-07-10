@@ -60,6 +60,7 @@ export async function GET(req: NextRequest) {
 
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+  // This MUST exactly match the URI registered in your Spotify Developer Dashboard.
   const redirectUri = 'https://localhost:9002/api/auth/callback/spotify';
 
   debugInfo["Server Configuration"] = {
