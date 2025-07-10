@@ -28,7 +28,7 @@ export default function Home() {
 
   const handleLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-    const redirectUri = 'http://localhost:9002/api/auth/callback/spotify';
+    const redirectUri = 'https://localhost:9002/api/auth/callback/spotify';
     const scopes = [
       'user-read-private',
       'user-read-email',
