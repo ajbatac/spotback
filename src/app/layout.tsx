@@ -5,8 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/context/auth-context';
 
 export const metadata: Metadata = {
-  title: 'Spotify Playlist Organizer',
-  description: 'Organize your Spotify playlists with AI',
+  title: 'SpotBack - Backup Your Spotify Playlist',
+  description: 'Organize and backup your Spotify playlists with AI',
 };
 
 export default function RootLayout({
