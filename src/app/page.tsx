@@ -4,9 +4,10 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { getPlaylistsForUser, getUserProfile, getPlaylistWithAllTracks } from '@/lib/spotify';
-import type { SpotifyPlaylist, SpotifyTrack, SpotifyUserProfile } from '@/types/spotify';
+import { getPlaylistsForUser, getUserProfile, getPlaylistWithAllTracks, getTopArtists } from '@/lib/spotify';
+import type { SpotifyPlaylist, SpotifyTrack, SpotifyUserProfile, SpotifyArtist } from '@/types/spotify';
 import { PlaylistCard } from '@/components/playlist-card';
+import { TopArtistCard } from '@/components/top-artist-card';
 import { Loader2, LogIn, LogOut, User, Download, FileJson, FileText, FileArchive } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import JSZip from 'jszip';
@@ -18,6 +19,7 @@ export default function Home() {
 
   const [user, setUser] = useState<SpotifyUserProfile | null>(null);
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
+  const [topArtists, setTopArtists] = useState<SpotifyArtist[]>([]);
   const [loading, setLoading] = useState(true);
   const [isExporting, setIsExporting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -49,8 +51,12 @@ export default function Home() {
         setError(null);
         const userProfile = await getUserProfile(token);
         setUser(userProfile);
-        const userPlaylists = await getPlaylistsForUser(userProfile.id, token);
+        const [userPlaylists, topArtistsData] = await Promise.all([
+            getPlaylistsForUser(userProfile.id, token),
+            getTopArtists(token, 5)
+        ]);
         setPlaylists(userPlaylists);
+        setTopArtists(topArtistsData);
       } catch (e: any) {
         console.error(e);
         if (e.status === 401) {
@@ -77,7 +83,7 @@ export default function Home() {
     const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9002';
     const redirectUri = `${appUrl}/api/auth/callback/spotify`;
-    const scopes = "user-read-private user-read-email playlist-read-private playlist-read-collaborative";
+    const scopes = "user-read-private user-read-email playlist-read-private playlist-read-collaborative user-top-read";
     const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}`;
     window.location.href = authUrl;
   };
@@ -247,6 +253,17 @@ export default function Home() {
       
       {error && <p className="mb-4 text-destructive bg-destructive/10 p-4 rounded-md">{error}</p>}
       
+      {topArtists.length > 0 && (
+        <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Your Top Artists</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {topArtists.map(artist => (
+                    <TopArtistCard key={artist.id} artist={artist} />
+                ))}
+            </div>
+        </div>
+      )}
+
       <div className="mb-8 p-4 bg-muted/50 rounded-lg">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Step 1: Select Your Playlists</h2>

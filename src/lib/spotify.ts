@@ -1,6 +1,6 @@
 
 "use server";
-import type { SpotifyPlaylist, SpotifyTrack, Paged, SpotifyUserProfile } from '@/types/spotify';
+import type { SpotifyPlaylist, SpotifyTrack, Paged, SpotifyUserProfile, SpotifyArtist } from '@/types/spotify';
 
 const SPOTIFY_API_BASE = 'https://api.spotify.com/v1';
 
@@ -84,4 +84,11 @@ export async function getPlaylistWithAllTracks(playlistId: string, token: string
     playlistInfo.tracks.next = null; 
 
     return playlistInfo;
+}
+
+export async function getTopArtists(token: string, limit: number = 5): Promise<SpotifyArtist[]> {
+    const data = await fetchSpotify<Paged<SpotifyArtist>>(`${SPOTIFY_API_BASE}/me/top/artists?limit=${limit}&time_range=long_term`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return data.items;
 }

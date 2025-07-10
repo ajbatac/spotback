@@ -18,6 +18,7 @@ export interface SpotifyImage {
 export interface SpotifyArtist {
   id: string;
   name: string;
+  images?: SpotifyImage[];
 }
 
 export interface SpotifyAlbum {
@@ -44,6 +45,7 @@ export interface SpotifyPlaylist {
     href: string;
     total: number;
     items?: { track: SpotifyTrack }[];
+    next: string | null;
   };
   owner: {
     display_name: string;
