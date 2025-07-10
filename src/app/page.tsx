@@ -235,7 +235,7 @@ export default function Home() {
 
   return (
     <main className="container mx-auto p-4 md:p-8">
-       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div className="flex items-center gap-4">
             <div>
               <h1 className="text-4xl font-bold font-headline">SPOTBACK</h1>
@@ -243,52 +243,61 @@ export default function Home() {
             </div>
             <Button variant="outline" size="sm" onClick={handleLogout}><LogOut /> Logout</Button>
           </div>
-          <div className="flex items-center gap-2">
-             <div className="text-sm text-muted-foreground text-right mr-2">
-                <p>{selectedCount} playlist{selectedCount !== 1 ? 's' : ''} selected</p>
-                <p>of {playlists.length} total</p>
-             </div>
-            <Button variant="outline" onClick={handleSelectAll}>
-              {allSelected ? 'Deselect All' : 'Select All'}
-            </Button>
-          </div>
         </header>
-
-        <div className="flex flex-wrap items-center gap-2 mb-8 p-4 bg-muted/50 rounded-lg">
-            <Download className="mr-2 h-5 w-5 text-muted-foreground" />
-            <span className="font-medium mr-2">Backup Options:</span>
-            <Button size="sm" onClick={() => handleExport('csv')} disabled={selectedCount === 0 || !!isExporting}>
-              {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileText />}
-              Export as CSV
-            </Button>
-            <Button size="sm" onClick={() => handleExport('zip')} disabled={selectedCount === 0 || !!isExporting}>
-              {isExporting === 'zip' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileArchive />}
-              Export as ZIP
-            </Button>
-            <Button size="sm" onClick={() => handleExport('json')} disabled={selectedCount === 0 || !!isExporting}>
-              {isExporting === 'json' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileJson />}
-              Export as JSON
-            </Button>
-             <Button size="sm" variant="secondary" onClick={() => handleExport('official-json')} disabled={selectedCount === 0 || !!isExporting}>
-              {isExporting === 'official-json' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileJson />}
-              Spotify API Format
-            </Button>
-        </div>
-
+      
       {error && <p className="mb-4 text-destructive bg-destructive/10 p-4 rounded-md">{error}</p>}
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-        {playlists.map(p => (
-          <PlaylistCard 
-            key={p.id}
-            playlist={p}
-            isSelected={selectedPlaylists.has(p.id)}
-            onSelectionChange={handleSelectionChange}
-          />
-        ))}
+      <div className="mb-8 p-4 bg-muted/50 rounded-lg">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Step 1: Select Your Playlists</h2>
+          <div className="flex items-center gap-2">
+              <div className="text-sm text-muted-foreground text-right">
+                  <p>{selectedCount} playlist{selectedCount !== 1 ? 's' : ''} selected</p>
+                  <p>of {playlists.length} total</p>
+              </div>
+              <Button variant="outline" onClick={handleSelectAll}>
+                {allSelected ? 'Deselect All' : 'Select All'}
+              </Button>
+            </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+          {playlists.map(p => (
+            <PlaylistCard 
+              key={p.id}
+              playlist={p}
+              isSelected={selectedPlaylists.has(p.id)}
+              onSelectionChange={handleSelectionChange}
+            />
+          ))}
+        </div>
       </div>
+
+      {selectedCount > 0 && (
+        <div className="mb-8 p-4 bg-muted/50 rounded-lg">
+          <h2 className="text-2xl font-bold mb-4">Step 2: Choose Your Backup Format</h2>
+          <div className="flex flex-wrap items-center gap-2">
+              <Download className="mr-2 h-5 w-5 text-muted-foreground" />
+              <Button size="sm" onClick={() => handleExport('csv')} disabled={!!isExporting}>
+                {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileText />}
+                Export as CSV
+              </Button>
+              <Button size="sm" onClick={() => handleExport('zip')} disabled={!!isExporting}>
+                {isExporting === 'zip' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileArchive />}
+                Export as ZIP
+              </Button>
+              <Button size="sm" onClick={() => handleExport('json')} disabled={!!isExporting}>
+                {isExporting === 'json' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileJson />}
+                Export as JSON
+              </Button>
+              <Button size="sm" variant="secondary" onClick={() => handleExport('official-json')} disabled={!!isExporting}>
+                {isExporting === 'official-json' ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileJson />}
+                Spotify API Format
+              </Button>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }
-
-    
