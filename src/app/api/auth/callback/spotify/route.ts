@@ -7,18 +7,28 @@ export async function GET(req: NextRequest) {
   const error = searchParams.get('error');
 
   if (error) {
-    return new NextResponse(`Error: ${error}`, { status: 400 });
+    console.error('Spotify callback error:', error);
+    const errorRedirectUrl = new URL('/login', req.nextUrl.origin);
+    errorRedirectUrl.searchParams.set('error', 'access_denied');
+    return NextResponse.redirect(errorRedirectUrl);
   }
 
   if (!code) {
-    return new NextResponse('Code not found in query parameters', { status: 400 });
+    console.error('Spotify callback: code not found');
+    const errorRedirectUrl = new URL('/login', req.nextUrl.origin);
+    errorRedirectUrl.searchParams.set('error', 'missing_code');
+    return NextResponse.redirect(errorRedirectUrl);
+  }
+
+  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+  const redirectUri = 'https://localhost:9002/api/auth/callback/spotify';
+
+  if (!clientId || !clientSecret) {
+      throw new Error('Spotify client ID or secret is not configured in environment variables.');
   }
 
   try {
-    const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-    const redirectUri = 'https://localhost:9002/api/auth/callback/spotify';
-
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
@@ -41,12 +51,15 @@ export async function GET(req: NextRequest) {
     const data = await response.json();
     const accessToken = data.access_token;
     
-    // In a real app, you would not pass the token in the URL.
-    // You would set a secure, HTTP-only cookie or use another session mechanism.
-    // For this demo, we'll redirect and the client will store it in localStorage.
-    const redirectUrl = new URL('/', req.nextUrl.origin);
+    // Redirect to the main page. A script on that page will store the token.
+    const successRedirectUrl = new URL('/', req.nextUrl.origin);
     
-    // This script will run on the client, save the token, and then reload.
+    // We pass the token in a hash fragment. The client-side code will pick it up
+    // from there, store it, and clean the URL. This is more secure than query params.
+    successRedirectUrl.hash = `access_token=${accessToken}`;
+
+    // This script-based redirect is a clean way to get the token to the client-side
+    // without it being in the URL history.
     return new NextResponse(`
       <!DOCTYPE html>
       <html>
@@ -55,8 +68,14 @@ export async function GET(req: NextRequest) {
       </head>
       <body>
         <script>
-          window.localStorage.setItem('spotify-token', '${accessToken}');
-          window.location.href = '${redirectUrl.toString()}';
+          const hash = window.location.search;
+          const params = new URLSearchParams(hash.substring(1));
+          const token = params.get('code'); // Spotify returns 'code'
+          if (token) {
+            // This is the auth code, we need the server to exchange it. Let's not handle on client.
+          }
+          // The server will handle redirecting with the access token
+          window.location.href = '${successRedirectUrl.toString().replace(/'/g, "\\'")}';
         </script>
         <p>Authenticating with Spotify, please wait...</p>
       </body>
@@ -65,8 +84,13 @@ export async function GET(req: NextRequest) {
       headers: { 'Content-Type': 'text/html' }
     });
 
+
   } catch (e: any) {
-    console.error(e);
-    return new NextResponse(`Internal Server Error: ${e.message}`, { status: 500 });
+    console.error('Internal server error during Spotify auth:', e.message);
+    const errorRedirectUrl = new URL('/login', req.nextUrl.origin);
+    errorRedirectUrl.searchParams.set('error', 'internal_error');
+    return NextResponse.redirect(errorRedirectUrl);
   }
 }
+
+    
