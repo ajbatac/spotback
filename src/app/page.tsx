@@ -204,7 +204,7 @@ export default function Home() {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-lg text-muted-foreground">Loading playlists...</p>
+        <p className="mt-4 text-lg text-muted-foreground">Loading your library...</p>
       </div>
     );
   }
@@ -212,11 +212,13 @@ export default function Home() {
   if (!token) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background p-4 text-center">
-        <h1 className="text-4xl font-bold font-headline mb-2">Welcome to SPOTBACK</h1>
-        <p className="text-lg text-muted-foreground mb-6 max-w-md">Please log in with your Spotify account to view and back up your playlists.</p>
+        <h1 className="text-5xl font-extrabold tracking-tight font-headline mb-4">Backup Your Spotify Playlists</h1>
+        <p className="text-lg text-muted-foreground mb-8 max-w-xl">
+          Never lose your curated music collections again. With SPOTBACK, you can easily save your playlists in various formats, including CSV, JSON, and the official Spotify format for easy transfer.
+        </p>
         {error && <p className="mb-4 text-destructive">{error}</p>}
         <Button size="lg" onClick={handleLogin}>
-          <LogIn className="mr-2" /> Login with Spotify
+          <LogIn className="mr-2" /> Login with Spotify to Start
         </Button>
       </div>
     );
