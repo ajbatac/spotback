@@ -10,7 +10,6 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-    // This MUST exactly match the URI registered in your Spotify Developer Dashboard.
     const redirectUri = 'http://127.0.0.1:9002/api/auth/callback/spotify';
     const scopes = [
       'user-read-private',
@@ -19,15 +18,11 @@ export default function LoginPage() {
       'playlist-read-collaborative',
     ];
     
-    // Construct the URL ensuring all parts are correct.
-    const params = new URLSearchParams({
-        response_type: 'code',
-        client_id: clientId || '',
-        scope: scopes.join(' '),
-        redirect_uri: redirectUri,
-    });
-
-    const generatedAuthUrl = `https://accounts.spotify.com/authorize?${params.toString()}`;
+    // Manual URL construction to avoid any URLSearchParams encoding issues.
+    const scopeString = encodeURIComponent(scopes.join(' '));
+    const redirectUriString = encodeURIComponent(redirectUri);
+    
+    const generatedAuthUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${scopeString}&redirect_uri=${redirectUriString}`;
     
     setAuthUrl(generatedAuthUrl);
     
