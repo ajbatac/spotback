@@ -1,60 +1,54 @@
 
-"use client";
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { LogIn, Library } from 'lucide-react';
+import React from 'react';
 
 export default function LoginPage() {
-  const [authUrl, setAuthUrl] = useState<string | null>(null);
+  const clientId = '8b373f6c1fe94611a68553f3c0e49c45'; 
+  const redirectUri = 'http://127.0.0.1:9002/api/auth/callback/spotify';
+  const scopes = [
+    'user-read-private',
+    'user-read-email',
+    'playlist-read-private',
+    'playlist-read-collaborative',
+  ];
+  
+  const scopeString = encodeURIComponent(scopes.join(' '));
+  const redirectUriString = encodeURIComponent(redirectUri);
 
-  const handleLogin = () => {
-    const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-    const redirectUri = 'http://127.0.0.1:9002/api/auth/callback/spotify';
-    const scopes = [
-      'user-read-private',
-      'user-read-email',
-      'playlist-read-private',
-      'playlist-read-collaborative',
-    ];
-    
-    // Manual URL construction to avoid any URLSearchParams encoding issues.
-    const scopeString = encodeURIComponent(scopes.join(' '));
-    const redirectUriString = encodeURIComponent(redirectUri);
-    
-    const generatedAuthUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${scopeString}&redirect_uri=${redirectUriString}`;
-    
-    setAuthUrl(generatedAuthUrl);
-    
-    // Redirect immediately
-    window.location.href = generatedAuthUrl;
-  };
+  const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${scopeString}&redirect_uri=${redirectUriString}`;
 
   return (
-    <div className="min-h-screen w-full bg-background font-body text-foreground flex items-center justify-center p-4">
-      <div className="flex flex-col items-center justify-center text-center p-8 max-w-2xl w-full bg-background shadow-neumorphic rounded-lg">
-          <Library size={64} className="text-primary mb-6" />
-          <h1 className="text-3xl font-bold font-headline mb-2 text-foreground">Welcome to SpotBack</h1>
-          <p className="text-muted-foreground mb-8">Export and backup your Spotify playlists with ease.</p>
-          <Button onClick={handleLogin} disabled={!!authUrl} className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm active:shadow-neumorphic-inset-sm transition-all duration-200">
-              <LogIn className="h-5 w-5 mr-3" />
-              {authUrl ? 'Redirecting...' : 'Login with Spotify'}
-          </Button>
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mt-8 p-4 bg-muted rounded-md text-left w-full">
-              <h2 className="text-lg font-bold mb-2">Debug Information</h2>
-              <p className="font-semibold">NEXT_PUBLIC_SPOTIFY_CLIENT_ID:</p>
-              <pre className="text-xs bg-gray-800 text-white p-2 rounded-md break-words whitespace-pre-wrap">
-                <code>{process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || 'Not Found!'}</code>
-              </pre>
-              <p className="font-semibold mt-2">Generated Authorization URL:</p>
-              <pre className="text-xs bg-gray-800 text-white p-2 rounded-md break-words whitespace-pre-wrap">
-                <code>{authUrl ? authUrl : 'Click button to generate...'}</code>
-              </pre>
-              {authUrl && <p className="mt-2 text-sm text-muted-foreground">Redirecting...</p>}
-            </div>
-          )}
-      </div>
+    <div style={{ fontFamily: 'sans-serif', padding: '2rem' }}>
+      <h1>Spotify Login Test</h1>
+      <p>This is a barebones test to isolate the redirect URI issue.</p>
+      <p>
+        The link below is a simple, hardcoded <code>&lt;a&gt;</code> tag. There is no React state or dynamic logic involved in its creation.
+      </p>
+      <p>
+        <strong>Action:</strong> Click this link.
+      </p>
+      <a 
+        href={authUrl} 
+        style={{
+          fontSize: '1.2rem',
+          color: '#1DB954',
+          border: '2px solid #1DB954',
+          padding: '10px 20px',
+          display: 'inline-block',
+          marginTop: '1rem',
+          textDecoration: 'none'
+        }}
+      >
+        Login with Spotify (Hardcoded Link)
+      </a>
+      <hr style={{ margin: '2rem 0' }} />
+      <h2>Generated URL Details</h2>
+      <p>The link above points to the following URL:</p>
+      <pre style={{ backgroundColor: '#f0f0f0', padding: '1rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+        <code>{authUrl}</code>
+      </pre>
+      <p style={{ marginTop: '1rem' }}>
+        If this still fails with an "Insecure redirect URI" error, it confirms the issue is a mismatch with the URI configured in your Spotify Developer Dashboard. Please ensure it is set to <strong>exactly</strong>: <code>{redirectUri}</code>
+      </p>
     </div>
   );
 }
