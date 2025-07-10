@@ -58,32 +58,7 @@ export async function GET(req: NextRequest) {
     // from there, store it, and clean the URL. This is more secure than query params.
     successRedirectUrl.hash = `access_token=${accessToken}`;
 
-    // This script-based redirect is a clean way to get the token to the client-side
-    // without it being in the URL history.
-    return new NextResponse(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Authenticating...</title>
-      </head>
-      <body>
-        <script>
-          const hash = window.location.search;
-          const params = new URLSearchParams(hash.substring(1));
-          const token = params.get('code'); // Spotify returns 'code'
-          if (token) {
-            // This is the auth code, we need the server to exchange it. Let's not handle on client.
-          }
-          // The server will handle redirecting with the access token
-          window.location.href = '${successRedirectUrl.toString().replace(/'/g, "\\'")}';
-        </script>
-        <p>Authenticating with Spotify, please wait...</p>
-      </body>
-      </html>
-    `, {
-      headers: { 'Content-Type': 'text/html' }
-    });
-
+    return NextResponse.redirect(successRedirectUrl);
 
   } catch (e: any) {
     console.error('Internal server error during Spotify auth:', e.message);
@@ -92,5 +67,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(errorRedirectUrl);
   }
 }
-
     

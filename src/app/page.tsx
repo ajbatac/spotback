@@ -11,10 +11,11 @@ import { PlaylistCard } from '@/components/playlist-card';
 import { getPlaylistsForUser, getPlaylistWithAllTracks, getUserProfile } from '@/lib/spotify';
 import type { SpotifyPlaylist, SpotifyTrack, SpotifyUserProfile } from '@/types/spotify';
 import { organizePlaylistMetadata } from '@/ai/flows/organize-playlist-metadata';
+import { useAuth } from '@/context/auth-context';
 
 export default function Home() {
   const router = useRouter();
-  const [accessToken, setAccessToken] = useLocalStorage<string | null>('spotify-token', null);
+  const { accessToken, setAccessToken } = useAuth();
   const [user, setUser] = useLocalStorage<SpotifyUserProfile | null>('spotify-user', null);
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [selectedPlaylists, setSelectedPlaylists] = useState<Set<string>>(new Set());
@@ -23,18 +24,11 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // On component mount, check if we have a token. If not, redirect to login.
-    if (!accessToken) {
-      router.replace('/login');
-    }
-  }, [accessToken, router]);
-
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     setAccessToken(null);
     setUser(null);
-    router.replace('/login');
-  };
+    // The AuthProvider will handle the redirect
+  }, [setAccessToken, setUser]);
 
   const fetchPlaylists = useCallback(async () => {
     if (!accessToken || !user?.id) return;
@@ -79,10 +73,12 @@ export default function Home() {
   useEffect(() => {
     if(user?.id) {
         fetchPlaylists();
+    } else if (accessToken) {
+        setIsLoading(true); // We have a token, but no user yet, so we are loading user data
     } else {
-        setIsLoading(false);
+        setIsLoading(false); // No token, no user, not loading. AuthProvider will redirect.
     }
-  }, [user, fetchPlaylists]);
+  }, [user, accessToken, fetchPlaylists]);
 
   const handleSelectionChange = (playlistId: string) => {
     setSelectedPlaylists(prev => {
@@ -155,7 +151,6 @@ export default function Home() {
     }
   };
   
-  // Render nothing or a loading spinner while checking for token
   if (!accessToken) {
     return (
         <div className="min-h-screen w-full bg-background flex items-center justify-center">
@@ -174,7 +169,7 @@ export default function Home() {
                 <Library className="h-8 w-8 text-primary" />
                 <h1 className="text-2xl font-bold tracking-tight text-foreground font-headline">SpotBack</h1>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
                 {user ? (
                   <>
                     <span className="text-sm text-muted-foreground hidden sm:inline">Welcome, {user.display_name}</span>
@@ -241,5 +236,3 @@ export default function Home() {
     </>
   );
 }
-
-    

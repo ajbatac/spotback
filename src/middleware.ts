@@ -2,20 +2,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// This function can be marked `async` if using `await` inside
+// This middleware is largely superseded by client-side logic in AuthProvider,
+// but it can be kept for defense-in-depth or server-side route protection.
+// For now, we'll simplify it as the primary logic is now in the client.
+
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('spotify-token');
-
-  // If user is not authenticated and trying to access the main page, redirect to login
-  if (!token && request.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-  
-  // If user is authenticated and tries to access login, redirect to main page
-  if (token && request.nextUrl.pathname === '/login') {
-      return NextResponse.redirect(new URL('/', request.url));
-  }
-
+  // The client-side AuthProvider now handles redirection.
+  // Middleware can be used for things like blocking API routes if a token cookie isn't present,
+  // but for UI pages, client-side redirection provides a better user experience
+  // without a flash of unauthenticated content.
   return NextResponse.next();
 }
 
@@ -23,5 +18,4 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: ['/', '/login'],
 };
-
     
