@@ -2,25 +2,19 @@
 import React from 'react';
 
 export default function LoginPage() {
-  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-  const redirectUri = 'http://127.0.0.1:9002/api/auth/callback/spotify';
-  const scopes = [
-    'user-read-private',
-    'user-read-email',
-    'playlist-read-private',
-    'playlist-read-collaborative',
-  ];
-  
-  const scopeString = encodeURIComponent(scopes.join(' '));
-  const redirectUriString = encodeURIComponent(redirectUri);
+  // Hardcoded values to eliminate all variables.
+  const clientId = "8b373f6c1fe94611a68553f3c0e49c45";
+  const redirectUri = "http://127.0.0.1:9002/api/auth/callback/spotify";
+  const scopes = "user-read-private user-read-email playlist-read-private playlist-read-collaborative";
 
-  const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${scopeString}&redirect_uri=${redirectUriString}`;
+  // Manually build and encode the URL to ensure it is perfect.
+  const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}`;
 
   return (
     <div style={{ fontFamily: 'sans-serif', padding: '2rem' }}>
-      <h1>Spotify Login Test</h1>
+      <h1>Spotify Login Test - Barebones Link</h1>
       <p>
-        This is a barebones test to isolate the redirect URI issue. The link below is a simple, hardcoded <code>&lt;a&gt;</code> tag.
+        This is the simplest possible test. The link below is a completely hardcoded string.
       </p>
       <p>
         <strong>Action:</strong> Click this link.
