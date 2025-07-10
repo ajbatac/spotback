@@ -23,20 +23,25 @@ export default function Home() {
 
   useEffect(() => {
     const accessToken = searchParams.get('access_token');
-    if (accessToken) {
+    const errorParam = searchParams.get('error');
+
+    if (errorParam) {
+      setError(errorParam);
+      setToken(null);
+      router.replace('/');
+    } else if (accessToken && !token) {
       setToken(accessToken);
-      // Clean URL by removing the token from it
       router.replace('/');
     }
-  }, [searchParams, setToken, router]);
+  }, [searchParams, token, setToken, router, setError]);
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
     async function fetchData() {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      
       try {
         setLoading(true);
         setError(null);
@@ -86,7 +91,7 @@ export default function Home() {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-lg text-muted-foreground">Loading...</p>
+        <p className="mt-4 text-lg text-muted-foreground">Loading playlists...</p>
       </div>
     );
   }
