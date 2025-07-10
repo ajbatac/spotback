@@ -69,6 +69,8 @@ export default function Home() {
           }
         } else if (e.status === 429) {
           setError("You've made too many requests to Spotify. Please wait a moment and try again.");
+        } else if (e.status === 504) {
+          setError("There seems to be a temporary issue with Spotify's servers. Please try again in a moment.");
         } else {
           setError(e.message || 'An error occurred while fetching data from Spotify.');
           if (e.message.includes('scope')) {
