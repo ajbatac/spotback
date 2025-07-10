@@ -61,7 +61,6 @@ export async function GET(req: NextRequest) {
 
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-  // This MUST exactly match the URI registered in your Spotify Developer Dashboard.
   const redirectUri = 'http://127.0.0.1:9002/api/auth/callback/spotify';
 
   debugInfo["Server Configuration"] = {
@@ -114,9 +113,12 @@ export async function GET(req: NextRequest) {
     } 
 
     const token = responseData.access_token;
-    const location = `/#access_token=${token}`;
-    const redirectResponse = new NextResponse(null, { status: 302, headers: { Location: location } });
-    return redirectResponse;
+    const location = `/?access_token=${token}`;
+    debugInfo["Final Status"] = `<span class="success">Successfully exchanged code for token.</span>`;
+    debugInfo["Redirecting To"] = location;
+    
+    // Instead of redirecting immediately, we'll show the success debug page.
+    return createDebugResponse(debugInfo);
 
   } catch (e: any) {
     debugInfo["Fatal Error during Fetch"] = {
