@@ -8,7 +8,6 @@ import useLocalStorage from '@/hooks/use-local-storage';
 import { CredentialsDialog } from '@/components/credentials-dialog';
 import { PlaylistCard } from '@/components/playlist-card';
 import { getPlaylistsForUser, getPlaylistWithAllTracks, getAccessToken } from '@/lib/spotify';
-import { organizePlaylistMetadata } from '@/ai/flows/organize-playlist-metadata';
 import type { SpotifyPlaylist, SpotifyTrack } from '@/types/spotify';
 
 export default function Home() {
@@ -19,18 +18,25 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
 
   const hasCredentials = useMemo(() => credentials && credentials.clientId && credentials.clientSecret && credentials.userId, [credentials]);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+
     if (!hasCredentials) {
       setIsDialogOpen(true);
     } else {
       setIsDialogOpen(false);
       fetchPlaylists();
     }
-  }, [credentials, hasCredentials]);
+  }, [credentials, hasCredentials, isClient]);
 
   const fetchPlaylists = async () => {
     if (!credentials) return;
@@ -146,7 +152,7 @@ export default function Home() {
                 <h1 className="text-2xl font-bold tracking-tight text-foreground font-headline">SpotBack</h1>
               </div>
               <div className="flex items-center gap-2">
-                {hasCredentials && (
+                {isClient && hasCredentials && (
                   <Button variant="outline" size="sm" onClick={clearCredentials} className="shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm active:shadow-neumorphic-inset-sm transition-all duration-200">
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Change Credentials
@@ -162,7 +168,7 @@ export default function Home() {
         </header>
 
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
-          {!hasCredentials ? (
+          {!isClient || !hasCredentials ? (
              <div className="flex flex-col items-center justify-center text-center h-[60vh]">
                 <Library size={64} className="text-muted-foreground mb-4" />
                 <h2 className="text-2xl font-bold font-headline mb-2">Welcome to SpotBack</h2>
