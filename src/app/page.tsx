@@ -3,6 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
+import Script from 'next/script';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { getPlaylistsForUser, getUserProfile, getPlaylistWithAllTracks, getTopArtists } from '@/lib/spotify';
@@ -317,9 +318,22 @@ export default function Home() {
                 Spotify API Format
               </Button>
           </div>
+          <div className="mt-6">
+            <Script 
+              src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" 
+              data-name="bmc-button" 
+              data-slug="emailsig" 
+              data-color="#FFDD00" 
+              data-emoji="🍕"  
+              data-font="Cookie" 
+              data-text="Buy me a pizza?" 
+              data-outline-color="#000000" 
+              data-font-color="#000000" 
+              data-coffee-color="#ffffff" 
+            />
+          </div>
         </div>
       )}
-
     </main>
   );
 }
