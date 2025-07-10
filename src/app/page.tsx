@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { getPlaylistsForUser, getUserProfile, getPlaylistWithAllTracks } from '@/lib/spotify';
 import type { SpotifyPlaylist, SpotifyTrack, SpotifyUserProfile } from '@/types/spotify';
 import { PlaylistCard } from '@/components/playlist-card';
-import { Loader2, LogIn, User, Download, FileJson, FileText, FileArchive } from 'lucide-react';
+import { Loader2, LogIn, LogOut, User, Download, FileJson, FileText, FileArchive } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import JSZip from 'jszip';
 
@@ -80,6 +80,15 @@ export default function Home() {
     const scopes = "user-read-private user-read-email playlist-read-private playlist-read-collaborative";
     const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}`;
     window.location.href = authUrl;
+  };
+  
+  const handleLogout = () => {
+    setToken(null);
+    setUser(null);
+    setPlaylists([]);
+    setSelectedPlaylists(new Set());
+    setError(null);
+    router.push('/');
   };
 
   const handleSelectionChange = (id: string) => {
@@ -227,9 +236,12 @@ export default function Home() {
   return (
     <main className="container mx-auto p-4 md:p-8">
        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-          <div>
-            <h1 className="text-4xl font-bold font-headline">SPOTBACK</h1>
-            {user && <p className="text-muted-foreground flex items-center gap-2 mt-1"><User size={16}/> {user.display_name} ({user.id})</p>}
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold font-headline">SPOTBACK</h1>
+              {user && <p className="text-muted-foreground flex items-center gap-2 mt-1"><User size={16}/> {user.display_name}</p>}
+            </div>
+            <Button variant="outline" size="sm" onClick={handleLogout}><LogOut /> Logout</Button>
           </div>
           <div className="flex items-center gap-2">
              <div className="text-sm text-muted-foreground text-right mr-2">
@@ -278,3 +290,5 @@ export default function Home() {
     </main>
   );
 }
+
+    
