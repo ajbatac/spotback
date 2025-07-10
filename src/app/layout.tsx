@@ -23,6 +23,7 @@ export default function RootLayout({
         </AuthProvider>
         <Toaster />
         <Script
+          strategy="lazyOnload"
           src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
           data-name="bmc-button"
           data-slug="emailsig"
@@ -33,7 +34,6 @@ export default function RootLayout({
           data-outline-color="#000000"
           data-font-color="#000000"
           data-coffee-color="#ffffff"
-          strategy="lazyOnload"
         />
       </body>
     </html>

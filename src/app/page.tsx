@@ -12,7 +12,6 @@ import { TopArtistCard } from '@/components/top-artist-card';
 import { Loader2, LogIn, LogOut, User, Download, FileJson, FileText, FileArchive } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import JSZip from 'jszip';
-import { BuyMeAPizza } from '@/components/buy-me-a-pizza';
 
 export default function Home() {
   const { token, setToken } = useAuth();
@@ -63,7 +62,11 @@ export default function Home() {
         console.error(e);
         if (e.status === 401) {
           setError('Your session has expired. Please log in again.');
-          setToken(null);
+          if (e.message.includes('scope')) {
+             setToken(null); // Force re-login if scopes are insufficient
+          } else {
+             setToken(null);
+          }
         } else if (e.status === 429) {
           setError("You've made too many requests to Spotify. Please wait a moment and try again.");
         } else {
@@ -320,9 +323,6 @@ export default function Home() {
           </div>
         </div>
       )}
-      <div className="fixed bottom-4 left-4 z-50">
-        <BuyMeAPizza />
-      </div>
     </main>
   );
 }
