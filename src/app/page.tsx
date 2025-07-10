@@ -8,11 +8,13 @@ import { getPlaylistsForUser, getUserProfile } from '@/lib/spotify';
 import type { SpotifyPlaylist, SpotifyUserProfile } from '@/types/spotify';
 import { PlaylistCard } from '@/components/playlist-card';
 import { Loader2, LogIn, User } from 'lucide-react';
+import { useAuth } from '@/context/auth-context';
 
 export default function Home() {
+  const { token, setToken } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
+
   const [user, setUser] = useState<SpotifyUserProfile | null>(null);
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,17 +24,11 @@ export default function Home() {
   useEffect(() => {
     const accessToken = searchParams.get('access_token');
     if (accessToken) {
-      localStorage.setItem('spotify_access_token', accessToken);
       setToken(accessToken);
-      // Clean URL
+      // Clean URL by removing the token from it
       router.replace('/');
-    } else {
-      const storedToken = localStorage.getItem('spotify_access_token');
-      if (storedToken) {
-        setToken(storedToken);
-      }
     }
-  }, [searchParams, router]);
+  }, [searchParams, setToken, router]);
 
   useEffect(() => {
     if (!token) {
@@ -52,9 +48,8 @@ export default function Home() {
         console.error(e);
         setError(e.message || 'An error occurred while fetching data from Spotify.');
         if (e.status === 401) {
-            localStorage.removeItem('spotify_access_token');
-            setToken(null);
-            setError('Your session has expired. Please log in again.');
+          setError('Your session has expired. Please log in again.');
+          setToken(null);
         }
       } finally {
         setLoading(false);
@@ -62,7 +57,7 @@ export default function Home() {
     }
 
     fetchData();
-  }, [token]);
+  }, [token, setToken]);
   
   const handleLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
@@ -90,7 +85,7 @@ export default function Home() {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-lg text-muted-foreground">Loading Spotify Data...</p>
+        <p className="mt-4 text-lg text-muted-foreground">Loading...</p>
       </div>
     );
   }
