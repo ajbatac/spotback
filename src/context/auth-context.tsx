@@ -29,13 +29,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const token = hash.split('access_token=')[1].split('&')[0];
           setAccessToken(token);
           // Clean the URL by replacing the history state
-          window.history.replaceState(null, '', window.location.pathname);
+          window.history.replaceState(null, '', '/');
         }
     }
   }, [setAccessToken]);
 
   useEffect(() => {
     if (!isMounted) return;
+
+    // Check for error in query params
+    if(typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        if (error) {
+            // Optionally show a toast or message to the user
+            console.error("Spotify Auth Error:", error);
+            // Clean the URL
+            window.history.replaceState(null, '', '/login');
+        }
+    }
 
     if (!accessToken && pathname !== '/login') {
        router.replace('/login');
@@ -60,4 +72,3 @@ export function useAuth() {
   }
   return context;
 }
-    

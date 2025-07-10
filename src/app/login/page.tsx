@@ -11,7 +11,7 @@ export default function LoginPage() {
   const handleLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
     // This MUST exactly match the URI registered in your Spotify Developer Dashboard.
-    const redirectUri = 'https://localhost:9002/api/auth/callback/spotify';
+    const redirectUri = 'http://127.0.0.1:9002/api/auth/callback/spotify';
     const scopes = [
       'user-read-private',
       'user-read-email',

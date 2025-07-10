@@ -50,7 +50,8 @@ export async function GET(req: NextRequest) {
 
   if (error) {
     debugInfo["Error Details"] = "Spotify returned an error. See above.";
-    return createDebugResponse(debugInfo);
+    const response = new NextResponse(null, { status: 302, headers: { Location: `/?error=${encodeURIComponent(error)}` } });
+    return response;
   }
 
   if (!code) {
@@ -61,7 +62,7 @@ export async function GET(req: NextRequest) {
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
   // This MUST exactly match the URI registered in your Spotify Developer Dashboard.
-  const redirectUri = 'https://localhost:9002/api/auth/callback/spotify';
+  const redirectUri = 'http://127.0.0.1:9002/api/auth/callback/spotify';
 
   debugInfo["Server Configuration"] = {
     "Client ID (from env)": clientId,
@@ -101,20 +102,21 @@ export async function GET(req: NextRequest) {
     });
 
     const responseData = await response.json();
-    debugInfo["Token Response from Spotify"] = {
-        "Status": response.status,
-        "Status Text": response.statusText,
-        "Body": responseData
-    };
     
     if (!response.ok) {
         debugInfo["Final Status"] = `<span class="error">Failed to exchange code for token.</span>`;
-    } else {
-        debugInfo["Final Status"] = `<span class="success">Token exchange was successful!</span>`;
-        debugInfo["Next Step"] = `Would normally redirect to /#access_token=${responseData.access_token.substring(0, 15)}...`;
-    }
+        debugInfo["Token Response from Spotify"] = {
+            "Status": response.status,
+            "Status Text": response.statusText,
+            "Body": responseData
+        };
+        return createDebugResponse(debugInfo);
+    } 
 
-    return createDebugResponse(debugInfo);
+    const token = responseData.access_token;
+    const location = `/#access_token=${token}`;
+    const redirectResponse = new NextResponse(null, { status: 302, headers: { Location: location } });
+    return redirectResponse;
 
   } catch (e: any) {
     debugInfo["Fatal Error during Fetch"] = {
