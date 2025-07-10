@@ -5,7 +5,7 @@ import type { SpotifyPlaylist, SpotifyTrack, Paged, SpotifyUserProfile } from '@
 const SPOTIFY_API_BASE = 'https://api.spotify.com/v1';
 
 class SpotifyApiError extends Error {
-  constructor(message: string, public status: number) {
+  constructor(message: string, public status: number, public retryAfter: number | null = null) {
     super(message);
     this.name = 'SpotifyApiError';
   }
@@ -16,7 +16,9 @@ async function fetchSpotify<T>(url: string, options: RequestInit): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     const message = errorData.error?.message || `Spotify API request failed with status ${response.status}`;
-    throw new SpotifyApiError(message, response.status);
+    const retryAfterHeader = response.headers.get('Retry-After');
+    const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader, 10) : null;
+    throw new SpotifyApiError(message, response.status, retryAfter);
   }
   // Handle cases where response is empty
   const text = await response.text();
@@ -57,7 +59,7 @@ export async function getPlaylistWithAllTracks(playlistId: string, token: string
     let tracks: { track: SpotifyTrack }[] = [];
     // Start with the initial track list from the playlist object
     if (playlistInfo.tracks && playlistInfo.tracks.items) {
-        tracks = tracks.concat(playlistInfo.tracks.items.filter(item => item.track));
+        tracks = tracks.concat(playlistInfo.tracks.items.filter(item => item && item.track));
     }
     
     let url: string | null = playlistInfo.tracks.next;
@@ -68,7 +70,7 @@ export async function getPlaylistWithAllTracks(playlistId: string, token: string
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (data && data.items) {
-          tracks = tracks.concat(data.items.filter(item => item.track)); // Filter out null tracks if any
+          tracks = tracks.concat(data.items.filter(item => item && item.track)); // Filter out null tracks if any
           url = data.next;
         } else {
           url = null;

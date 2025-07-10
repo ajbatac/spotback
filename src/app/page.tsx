@@ -64,10 +64,13 @@ export default function Home() {
         setPlaylists(userPlaylists);
       } catch (e: any) {
         console.error(e);
-        setError(e.message || 'An error occurred while fetching data from Spotify.');
         if (e.status === 401) {
           setError('Your session has expired. Please log in again.');
           setToken(null);
+        } else if (e.status === 429) {
+          setError("You've made too many requests to Spotify. Please wait a moment and try again.");
+        } else {
+          setError(e.message || 'An error occurred while fetching data from Spotify.');
         }
       } finally {
         setLoading(false);
@@ -129,6 +132,7 @@ export default function Home() {
 
   const handleExport = async (format: 'json' | 'csv' | 'zip' | 'official-json') => {
     try {
+      setError(null);
       const fullPlaylistsData = await fetchFullPlaylists();
 
       if (format === 'official-json') {
@@ -157,7 +161,11 @@ export default function Home() {
         triggerDownload(zipBlob, "playlists.zip");
       }
     } catch (e: any) {
-      setError(e.message || "Failed to export playlists.");
+      if (e.status === 429) {
+        setError("You've made too many requests to Spotify. Please wait a moment before exporting.");
+      } else {
+        setError(e.message || "Failed to export playlists.");
+      }
     }
   }
   
