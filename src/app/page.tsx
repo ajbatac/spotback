@@ -323,6 +323,13 @@ export default function Home() {
           </div>
         </div>
       )}
+       <div className="fixed bottom-4 left-4 z-50">
+        <iframe 
+          src="/bmc-button.html" 
+          style={{ border: 0, width: '220px', height: '60px' }}
+          title="Buy Me a Pizza"
+        ></iframe>
+      </div>
     </main>
   );
 }
