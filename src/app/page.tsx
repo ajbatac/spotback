@@ -1,20 +1,19 @@
 
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { Library, ListMusic, Download, Loader2, FileDown, AlertCircle, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Library, ListMusic, Download, Loader2, FileDown, AlertCircle, RefreshCw, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/hooks/use-toast";
 import useLocalStorage from '@/hooks/use-local-storage';
-import { CredentialsDialog } from '@/components/credentials-dialog';
 import { PlaylistCard } from '@/components/playlist-card';
-import { getPlaylistsForUser, getPlaylistWithAllTracks, getAccessToken } from '@/lib/spotify';
-import type { SpotifyPlaylist, SpotifyTrack } from '@/types/spotify';
+import { getPlaylistsForUser, getPlaylistWithAllTracks, getUserProfile } from '@/lib/spotify';
+import type { SpotifyPlaylist, SpotifyTrack, SpotifyUserProfile } from '@/types/spotify';
 import { organizePlaylistMetadata } from '@/ai/flows/organize-playlist-metadata';
 
 export default function Home() {
-  const [userId, setUserId] = useLocalStorage<string | null>('spotback-user-id', null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [accessToken, setAccessToken] = useLocalStorage<string | null>('spotify-token', null);
+  const [user, setUser] = useLocalStorage<SpotifyUserProfile | null>('spotify-user', null);
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [selectedPlaylists, setSelectedPlaylists] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
@@ -27,29 +26,42 @@ export default function Home() {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    if (!isClient) return;
+  const handleLogin = () => {
+    const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+    const redirectUri = 'http://localhost:9002/api/auth/callback/spotify';
+    const scopes = [
+      'user-read-private',
+      'user-read-email',
+      'playlist-read-private',
+      'playlist-read-collaborative',
+    ];
+    const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${scopes.join('%20')}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+    window.location.href = authUrl;
+  };
 
-    if (!userId) {
-      setIsDialogOpen(true);
-    } else {
-      setIsDialogOpen(false);
-      fetchPlaylists();
-    }
-  }, [userId, isClient]);
+  const handleLogout = () => {
+    setAccessToken(null);
+    setUser(null);
+    setPlaylists([]);
+    setError(null);
+    setSelectedPlaylists(new Set());
+  };
 
-  const fetchPlaylists = async () => {
-    if (!userId) return;
+  const fetchPlaylists = useCallback(async () => {
+    if (!accessToken || !user?.id) return;
     setIsLoading(true);
     setError(null);
     setPlaylists([]);
     try {
-      const token = await getAccessToken();
-      const userPlaylists = await getPlaylistsForUser(userId, token);
+      const userPlaylists = await getPlaylistsForUser(user.id, accessToken);
       setPlaylists(userPlaylists);
     } catch (e: any) {
       console.error(e);
-      const errorMessage = e.message || "Failed to fetch playlists. Please check your User ID and that your .env file is set up correctly.";
+      let errorMessage = "Failed to fetch playlists. Your session might have expired.";
+      if (e.status === 401) {
+        handleLogout();
+        errorMessage += " Please log in again.";
+      }
       setError(errorMessage);
       toast({
         variant: "destructive",
@@ -59,7 +71,28 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [accessToken, user?.id, toast]);
+
+  useEffect(() => {
+    if (isClient && accessToken && !user) {
+      const fetchUser = async () => {
+        try {
+          const profile = await getUserProfile(accessToken);
+          setUser(profile);
+        } catch (e) {
+          console.error("Failed to fetch user profile", e);
+          handleLogout();
+        }
+      };
+      fetchUser();
+    }
+  }, [isClient, accessToken, user, setUser]);
+  
+  useEffect(() => {
+    if(isClient && user?.id) {
+        fetchPlaylists();
+    }
+  }, [isClient, user, fetchPlaylists]);
 
   const handleSelectionChange = (playlistId: string) => {
     setSelectedPlaylists(prev => {
@@ -74,20 +107,19 @@ export default function Home() {
   };
 
   const handleExport = async () => {
-    if (selectedPlaylists.size === 0) {
+    if (!accessToken || selectedPlaylists.size === 0) {
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "No playlists selected for export.",
+        description: !accessToken ? "You are not logged in." : "No playlists selected for export.",
       });
       return;
     }
 
     setIsExporting(true);
     try {
-      const token = await getAccessToken();
       const fullPlaylists = await Promise.all(
-        Array.from(selectedPlaylists).map(id => getPlaylistWithAllTracks(id, token))
+        Array.from(selectedPlaylists).map(id => getPlaylistWithAllTracks(id, accessToken))
       );
 
       const metadataString = fullPlaylists.map(p => 
@@ -132,19 +164,6 @@ export default function Home() {
       setIsExporting(false);
     }
   };
-  
-  const clearUserId = () => {
-    setUserId(null);
-    setPlaylists([]);
-    setError(null);
-    setSelectedPlaylists(new Set());
-    setIsDialogOpen(true);
-  }
-
-  const handleSaveUserId = (id: string) => {
-    setUserId(id);
-    setIsDialogOpen(false);
-  }
 
   return (
     <>
@@ -157,27 +176,35 @@ export default function Home() {
                 <h1 className="text-2xl font-bold tracking-tight text-foreground font-headline">SpotBack</h1>
               </div>
               <div className="flex items-center gap-2">
-                {isClient && userId && (
-                  <Button variant="outline" size="sm" onClick={clearUserId} className="shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm active:shadow-neumorphic-inset-sm transition-all duration-200">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Change User ID
+                {isClient && user ? (
+                  <>
+                    <span className="text-sm text-muted-foreground hidden sm:inline">Welcome, {user.display_name}</span>
+                    <Button variant="outline" size="sm" onClick={handleLogout} className="shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm active:shadow-neumorphic-inset-sm transition-all duration-200">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                    </Button>
+                    <Button onClick={handleExport} disabled={selectedPlaylists.size === 0 || isExporting} className="shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm active:shadow-neumorphic-inset-sm transition-all duration-200 bg-accent text-accent-foreground hover:bg-accent/90">
+                      {isExporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+                      Export ({selectedPlaylists.size})
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={handleLogin} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Login with Spotify
                   </Button>
                 )}
-                <Button onClick={handleExport} disabled={selectedPlaylists.size === 0 || isExporting} className="shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm active:shadow-neumorphic-inset-sm transition-all duration-200 bg-accent text-accent-foreground hover:bg-accent/90">
-                  {isExporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
-                  Export ({selectedPlaylists.size})
-                </Button>
               </div>
             </div>
           </div>
         </header>
 
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
-          {!isClient || !userId ? (
+          {!isClient || !user ? (
              <div className="flex flex-col items-center justify-center text-center h-[60vh]">
                 <Library size={64} className="text-muted-foreground mb-4" />
                 <h2 className="text-2xl font-bold font-headline mb-2">Welcome to SpotBack</h2>
-                <p className="text-muted-foreground">Please provide your Spotify User ID to begin.</p>
+                <p className="text-muted-foreground">Please login with Spotify to begin.</p>
              </div>
           ) : isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -213,7 +240,7 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center text-center h-[60vh] text-muted-foreground">
               <ListMusic size={48} className="mb-4" />
               <h2 className="text-2xl font-bold font-headline mb-2">No Playlists Found</h2>
-              <p>We couldn't find any playlists for this User ID.</p>
+              <p>We couldn't find any playlists for this user.</p>
               <Button onClick={fetchPlaylists} variant="outline" className="mt-6 shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm">
                 <RefreshCw className="mr-2 h-4 w-4" /> Refresh
               </Button>
@@ -221,13 +248,6 @@ export default function Home() {
           )}
         </main>
       </div>
-      <CredentialsDialog 
-        isOpen={isDialogOpen} 
-        onClose={() => setIsDialogOpen(false)} 
-        onSave={handleSaveUserId}
-      />
     </>
   );
 }
-
-    

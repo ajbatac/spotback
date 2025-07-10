@@ -1,9 +1,8 @@
 
 "use server";
-import type { SpotifyPlaylist, SpotifyTrack, Paged } from '@/types/spotify';
+import type { SpotifyPlaylist, SpotifyTrack, Paged, SpotifyUserProfile } from '@/types/spotify';
 
 const SPOTIFY_API_BASE = 'https://api.spotify.com/v1';
-const SPOTIFY_ACCOUNTS_BASE = 'https://accounts.spotify.com/api';
 
 class SpotifyApiError extends Error {
   constructor(message: string, public status: number) {
@@ -19,34 +18,15 @@ async function fetchSpotify<T>(url: string, options: RequestInit): Promise<T> {
     const message = errorData.error?.message || `Spotify API request failed with status ${response.status}`;
     throw new SpotifyApiError(message, response.status);
   }
-  return response.json();
+  // Handle cases where response is empty
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
 
-export async function getAccessToken(): Promise<string> {
-    const clientId = process.env.SPOTIFY_CLIENT_ID;
-    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-
-    if (!clientId || !clientSecret) {
-        throw new Error('Spotify API credentials are not set in the environment variables.');
-    }
-
-    const response = await fetch(`${SPOTIFY_ACCOUNTS_BASE}/token`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
-        },
-        body: 'grant_type=client_credentials',
-        cache: 'no-store'
+export async function getUserProfile(token: string): Promise<SpotifyUserProfile> {
+    return fetchSpotify<SpotifyUserProfile>(`${SPOTIFY_API_BASE}/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
     });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error_description || 'Failed to authenticate with Spotify');
-    }
-
-    const data = await response.json();
-    return data.access_token;
 }
 
 export async function getPlaylistsForUser(userId: string, token: string): Promise<SpotifyPlaylist[]> {
@@ -57,8 +37,12 @@ export async function getPlaylistsForUser(userId: string, token: string): Promis
         const data: Paged<SpotifyPlaylist> = await fetchSpotify(url, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        playlists = playlists.concat(data.items);
-        url = data.next;
+        if (data && data.items) {
+          playlists = playlists.concat(data.items);
+          url = data.next;
+        } else {
+          url = null;
+        }
     }
     return playlists;
 }
@@ -75,12 +59,14 @@ export async function getPlaylistWithAllTracks(playlistId: string, token: string
         const data: Paged<{ track: SpotifyTrack }> = await fetchSpotify(url, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        tracks = tracks.concat(data.items.filter(item => item.track)); // Filter out null tracks if any
-        url = data.next;
+        if (data && data.items) {
+          tracks = tracks.concat(data.items.filter(item => item.track)); // Filter out null tracks if any
+          url = data.next;
+        } else {
+          url = null;
+        }
     }
 
-    playlistInfo.tracks = { items: tracks, total: tracks.length };
+    playlistInfo.tracks = { ...playlistInfo.tracks, items: tracks, total: tracks.length };
     return playlistInfo;
 }
-
-    

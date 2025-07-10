@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 require('dotenv').config()
 
@@ -35,6 +36,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'image-cdn-fa.spotifycdn.com',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
 };

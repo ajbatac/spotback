@@ -51,13 +51,16 @@ export function CredentialsDialog({ isOpen, onClose, onSave }: CredentialsDialog
     form.reset();
   }
 
+  // This component is no longer used in the main flow but is kept for potential future use.
+  // The app now uses OAuth login.
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] bg-background shadow-neumorphic rounded-lg">
         <DialogHeader>
           <DialogTitle className="font-headline">Spotify User ID</DialogTitle>
           <DialogDescription>
-            Enter your Spotify User ID to find your playlists.
+            Enter your Spotify User ID to find your playlists. (This is now handled by login)
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -86,5 +89,3 @@ export function CredentialsDialog({ isOpen, onClose, onSave }: CredentialsDialog
     </Dialog>
   );
 }
-
-    
