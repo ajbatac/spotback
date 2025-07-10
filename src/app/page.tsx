@@ -66,6 +66,9 @@ export default function Home() {
           setError("You've made too many requests to Spotify. Please wait a moment and try again.");
         } else {
           setError(e.message || 'An error occurred while fetching data from Spotify.');
+          if (e.message.includes('scope')) {
+             setToken(null); // Force re-login if scopes are insufficient
+          }
         }
       } finally {
         setLoading(false);
