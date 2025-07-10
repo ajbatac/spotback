@@ -318,11 +318,11 @@ export default function Home() {
                 Spotify API Format
               </Button>
           </div>
-          <div className="mt-6">
-            <BuyMeAPizza />
-          </div>
         </div>
       )}
+      <div className="fixed bottom-4 left-4 z-50">
+        <BuyMeAPizza />
+      </div>
     </main>
   );
 }
