@@ -20,7 +20,7 @@ export function BuyMeAPizza() {
     
     const container = document.getElementById('buy-me-a-pizza-container');
     if (container) {
-      // Clear previous buttons if any
+      // Clear previous buttons if any to prevent script conflicts on re-render
       while(container.firstChild) {
           container.removeChild(container.firstChild);
       }
@@ -30,7 +30,11 @@ export function BuyMeAPizza() {
     return () => {
       // Cleanup the script when the component is unmounted
       if (container && container.contains(script)) {
-        container.removeChild(script);
+        try {
+            container.removeChild(script);
+        } catch (e) {
+            // Ignore error if script is already gone
+        }
       }
     };
   }, []);
