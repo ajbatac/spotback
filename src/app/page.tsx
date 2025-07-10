@@ -9,7 +9,7 @@ import { getPlaylistsForUser, getUserProfile, getPlaylistWithAllTracks, getTopAr
 import type { SpotifyPlaylist, SpotifyTrack, SpotifyUserProfile, SpotifyArtist } from '@/types/spotify';
 import { PlaylistCard } from '@/components/playlist-card';
 import { TopArtistCard } from '@/components/top-artist-card';
-import { Loader2, LogIn, LogOut, User, Download, FileJson, FileText, FileArchive } from 'lucide-react';
+import { Loader2, LogIn, LogOut, User, Download, FileJson, FileText, FileArchive, Library, ShieldCheck, Share2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import JSZip from 'jszip';
 
@@ -236,16 +236,52 @@ export default function Home() {
 
   if (!token) {
     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center bg-background p-4 text-center">
-        <Image src="/spotify.png" alt="SpotBack Logo" width={80} height={80} className="mb-4" />
-        <h1 className="text-5xl font-extrabold tracking-tight font-headline mb-4">SpotBack - Backup Your Spotify Playlist</h1>
-        <p className="text-lg text-muted-foreground mb-8 max-w-xl">
-          Never lose your curated music collections again. With SpotBack, you can easily save your playlists in various formats, including CSV, JSON, and the official Spotify format for easy transfer.
-        </p>
-        {error && <p className="mb-4 text-destructive">{error}</p>}
-        <Button size="lg" onClick={handleLogin}>
-          <LogIn className="mr-2" /> Login with Spotify to Start
-        </Button>
+      <div className="flex h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-background to-slate-900 p-4 text-center overflow-hidden">
+        <div className="absolute inset-0 bg-grid-slate-800 [mask-image:linear-gradient(to_bottom,white_5%,transparent_80%)]"></div>
+        <div className="absolute top-0 left-0 h-full w-full bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+        <div className="relative z-10 flex flex-col items-center justify-center h-full">
+
+            <div 
+              className="flex flex-col items-center justify-center space-y-6 animate-in fade-in slide-in-from-top-12 duration-500"
+            >
+                <div className="flex items-center gap-4 mb-2">
+                    <Image src="/spotify.png" alt="SpotBack Logo" width={60} height={60} />
+                    <h1 className="text-6xl font-extrabold tracking-tight">SpotBack</h1>
+                </div>
+                
+                <p className="text-2xl text-muted-foreground max-w-2xl">
+                    Your Spotify library, secured. Never lose your curated playlists again.
+                </p>
+                {error && <p className="mb-4 text-destructive">{error}</p>}
+                <Button size="lg" onClick={handleLogin} className="rounded-full shadow-lg shadow-primary/30 transition-transform hover:scale-105">
+                  <LogIn className="mr-2" /> Login with Spotify to Start
+                </Button>
+            </div>
+            
+            <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl animate-in fade-in slide-in-from-bottom-12 duration-500 delay-200">
+                <div className="flex flex-col items-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-white/10">
+                    <div className="p-3 bg-primary/20 rounded-lg border border-primary/30 mb-4">
+                        <Library className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">Full Library Backup</h3>
+                    <p className="text-muted-foreground text-sm">Export all your playlists, including track details, in multiple formats.</p>
+                </div>
+                 <div className="flex flex-col items-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-white/10">
+                    <div className="p-3 bg-primary/20 rounded-lg border border-primary/30 mb-4">
+                        <ShieldCheck className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">Secure & Private</h3>
+                    <p className="text-muted-foreground text-sm">Your data is yours. We only request read-access and never store your information.</p>
+                </div>
+                 <div className="flex flex-col items-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-white/10">
+                    <div className="p-3 bg-primary/20 rounded-lg border border-primary/30 mb-4">
+                        <Share2 className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">Multiple Formats</h3>
+                    <p className="text-muted-foreground text-sm">Choose between CSV, JSON, and ZIP to use your data however you see fit.</p>
+                </div>
+            </div>
+        </div>
       </div>
     );
   }
@@ -256,7 +292,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <Image src="/spotify.png" alt="SpotBack Logo" width={50} height={50} />
             <div>
-              <h1 className="text-4xl font-bold font-headline">SpotBack - Backup Your Spotify Playlist</h1>
+              <h1 className="text-4xl font-bold font-headline">SpotBack</h1>
               {user && <p className="text-muted-foreground flex items-center gap-2 mt-1"><User size={16}/> {user.display_name}</p>}
             </div>
           </div>

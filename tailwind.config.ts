@@ -85,10 +85,15 @@ export default {
             height: '0',
           },
         },
+        'blur': {
+          from: { filter: 'blur(10px)', opacity: '0.5' },
+          to: { filter: 'blur(0px)', opacity: '1' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'blur': 'blur 0.8s ease-out forwards',
       },
       boxShadow: {
         'neumorphic': '8px 8px 16px hsl(var(--background) / 0.7), -8px -8px 16px hsl(0 0% 100% / 0.8)',
