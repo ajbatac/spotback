@@ -77,12 +77,14 @@ export function BuyMeAPizza() {
       if (bmcWidget && bmcWidget.parentElement) {
           bmcWidget.parentElement.removeChild(bmcWidget);
       }
-       while (container.firstChild) {
+       if (container && container.firstChild) {
           container.removeChild(container.firstChild);
-      }
+       }
     };
   }, []); // The empty dependency array ensures this runs only once on mount.
 
   // This div is the target container for our script to place the button.
   return <div id={CONTAINER_ID}></div>;
 }
+
+    
