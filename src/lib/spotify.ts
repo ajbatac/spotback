@@ -1,3 +1,4 @@
+
 "use server";
 import type { SpotifyPlaylist, SpotifyTrack, Paged } from '@/types/spotify';
 
@@ -21,7 +22,14 @@ async function fetchSpotify<T>(url: string, options: RequestInit): Promise<T> {
   return response.json();
 }
 
-export async function getAccessToken(clientId: string, clientSecret: string): Promise<string> {
+export async function getAccessToken(): Promise<string> {
+    const clientId = process.env.SPOTIFY_CLIENT_ID;
+    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+        throw new Error('Spotify API credentials are not set in the environment variables.');
+    }
+
     const response = await fetch(`${SPOTIFY_ACCOUNTS_BASE}/token`, {
         method: 'POST',
         headers: {
@@ -74,3 +82,5 @@ export async function getPlaylistWithAllTracks(playlistId: string, token: string
     playlistInfo.tracks = { items: tracks, total: tracks.length };
     return playlistInfo;
 }
+
+    

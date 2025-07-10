@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -9,9 +10,10 @@ import { CredentialsDialog } from '@/components/credentials-dialog';
 import { PlaylistCard } from '@/components/playlist-card';
 import { getPlaylistsForUser, getPlaylistWithAllTracks, getAccessToken } from '@/lib/spotify';
 import type { SpotifyPlaylist, SpotifyTrack } from '@/types/spotify';
+import { organizePlaylistMetadata } from '@/ai/flows/organize-playlist-metadata';
 
 export default function Home() {
-  const [credentials, setCredentials] = useLocalStorage<{ clientId: string; clientSecret: string; userId: string } | null>('spotback-credentials', null);
+  const [userId, setUserId] = useLocalStorage<string | null>('spotback-user-id', null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [selectedPlaylists, setSelectedPlaylists] = useState<Set<string>>(new Set());
@@ -21,8 +23,6 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
 
-  const hasCredentials = useMemo(() => credentials && credentials.clientId && credentials.clientSecret && credentials.userId, [credentials]);
-
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -30,26 +30,26 @@ export default function Home() {
   useEffect(() => {
     if (!isClient) return;
 
-    if (!hasCredentials) {
+    if (!userId) {
       setIsDialogOpen(true);
     } else {
       setIsDialogOpen(false);
       fetchPlaylists();
     }
-  }, [credentials, hasCredentials, isClient]);
+  }, [userId, isClient]);
 
   const fetchPlaylists = async () => {
-    if (!credentials) return;
+    if (!userId) return;
     setIsLoading(true);
     setError(null);
     setPlaylists([]);
     try {
-      const token = await getAccessToken(credentials.clientId, credentials.clientSecret);
-      const userPlaylists = await getPlaylistsForUser(credentials.userId, token);
+      const token = await getAccessToken();
+      const userPlaylists = await getPlaylistsForUser(userId, token);
       setPlaylists(userPlaylists);
     } catch (e: any) {
       console.error(e);
-      const errorMessage = e.message || "Failed to fetch playlists. Please check your credentials and User ID.";
+      const errorMessage = e.message || "Failed to fetch playlists. Please check your User ID and that your .env file is set up correctly.";
       setError(errorMessage);
       toast({
         variant: "destructive",
@@ -74,7 +74,7 @@ export default function Home() {
   };
 
   const handleExport = async () => {
-    if (selectedPlaylists.size === 0 || !credentials) {
+    if (selectedPlaylists.size === 0) {
       toast({
         variant: "destructive",
         title: "Export Failed",
@@ -85,7 +85,7 @@ export default function Home() {
 
     setIsExporting(true);
     try {
-      const token = await getAccessToken(credentials.clientId, credentials.clientSecret);
+      const token = await getAccessToken();
       const fullPlaylists = await Promise.all(
         Array.from(selectedPlaylists).map(id => getPlaylistWithAllTracks(id, token))
       );
@@ -133,12 +133,17 @@ export default function Home() {
     }
   };
   
-  const clearCredentials = () => {
-    setCredentials(null);
+  const clearUserId = () => {
+    setUserId(null);
     setPlaylists([]);
     setError(null);
     setSelectedPlaylists(new Set());
     setIsDialogOpen(true);
+  }
+
+  const handleSaveUserId = (id: string) => {
+    setUserId(id);
+    setIsDialogOpen(false);
   }
 
   return (
@@ -152,10 +157,10 @@ export default function Home() {
                 <h1 className="text-2xl font-bold tracking-tight text-foreground font-headline">SpotBack</h1>
               </div>
               <div className="flex items-center gap-2">
-                {isClient && hasCredentials && (
-                  <Button variant="outline" size="sm" onClick={clearCredentials} className="shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm active:shadow-neumorphic-inset-sm transition-all duration-200">
+                {isClient && userId && (
+                  <Button variant="outline" size="sm" onClick={clearUserId} className="shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm active:shadow-neumorphic-inset-sm transition-all duration-200">
                     <RefreshCw className="h-4 w-4 mr-2" />
-                    Change Credentials
+                    Change User ID
                   </Button>
                 )}
                 <Button onClick={handleExport} disabled={selectedPlaylists.size === 0 || isExporting} className="shadow-neumorphic-sm hover:shadow-neumorphic-inset-sm active:shadow-neumorphic-inset-sm transition-all duration-200 bg-accent text-accent-foreground hover:bg-accent/90">
@@ -168,11 +173,11 @@ export default function Home() {
         </header>
 
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
-          {!isClient || !hasCredentials ? (
+          {!isClient || !userId ? (
              <div className="flex flex-col items-center justify-center text-center h-[60vh]">
                 <Library size={64} className="text-muted-foreground mb-4" />
                 <h2 className="text-2xl font-bold font-headline mb-2">Welcome to SpotBack</h2>
-                <p className="text-muted-foreground">Please provide your Spotify API credentials to begin.</p>
+                <p className="text-muted-foreground">Please provide your Spotify User ID to begin.</p>
              </div>
           ) : isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -219,8 +224,10 @@ export default function Home() {
       <CredentialsDialog 
         isOpen={isDialogOpen} 
         onClose={() => setIsDialogOpen(false)} 
-        onSave={setCredentials}
+        onSave={handleSaveUserId}
       />
     </>
   );
 }
+
+    
