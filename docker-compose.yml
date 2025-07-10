@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "9002:9002"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    env_file:
+      - .env
+    # This ensures that the container will restart automatically if it crashes.
+    restart: unless-stopped
