@@ -4,7 +4,7 @@ import React from 'react';
 export default function LoginPage() {
   // IMPORTANT: Replace "YOUR_NEW_CLIENT_ID" with the Client ID from the NEW application 
   // you created in the Spotify Developer Dashboard.
-  const clientId = "YOUR_NEW_CLIENT_ID"; 
+  const clientId = "24d698cf100a45839dea80b3b2cec963"; 
   const redirectUri = "http://127.0.0.1:9002/api/auth/callback/spotify";
   const scopes = "user-read-private user-read-email playlist-read-private playlist-read-collaborative";
 
