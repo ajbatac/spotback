@@ -250,7 +250,7 @@ export default function Home() {
                 </div>
                 
                 <p className="text-2xl text-muted-foreground max-w-2xl">
-                    Your Spotify library, secured. Never lose your curated playlists again.
+                    Spotify doesn't have a backup option. Don't risk losing your perfectly curated playlists—secure your library with a single click.
                 </p>
                 {error && <p className="mb-4 text-destructive">{error}</p>}
                 <Button size="lg" onClick={handleLogin} className="rounded-full shadow-lg shadow-primary/30 transition-transform hover:scale-105">
@@ -263,22 +263,22 @@ export default function Home() {
                     <div className="p-3 bg-primary/20 rounded-lg border border-primary/30 mb-4">
                         <Library className="h-8 w-8 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold mb-2">Full Library Backup</h3>
-                    <p className="text-muted-foreground text-sm">Export all your playlists, including track details, in multiple formats.</p>
+                    <h3 className="text-xl font-bold mb-2">Your Music, Your Archive</h3>
+                    <p className="text-muted-foreground text-sm">Create a permanent, personal backup of your entire Spotify library. Your playlists are invaluable.</p>
                 </div>
                  <div className="flex flex-col items-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-white/10">
                     <div className="p-3 bg-primary/20 rounded-lg border border-primary/30 mb-4">
                         <ShieldCheck className="h-8 w-8 text-primary" />
                     </div>
                     <h3 className="text-xl font-bold mb-2">Secure & Private</h3>
-                    <p className="text-muted-foreground text-sm">Your data is yours. We only request read-access and never store your information.</p>
+                    <p className="text-muted-foreground text-sm">We only request read-access and never store your information. Your data is for your eyes only.</p>
                 </div>
                  <div className="flex flex-col items-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-white/10">
                     <div className="p-3 bg-primary/20 rounded-lg border border-primary/30 mb-4">
                         <Share2 className="h-8 w-8 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold mb-2">Multiple Formats</h3>
-                    <p className="text-muted-foreground text-sm">Choose between CSV, JSON, and ZIP to use your data however you see fit.</p>
+                    <h3 className="text-xl font-bold mb-2">Own Your Data</h3>
+                    <p className="text-muted-foreground text-sm">Export to CSV, JSON, or ZIP. Your music data, in your hands, in formats you can actually use.</p>
                 </div>
             </div>
         </div>
