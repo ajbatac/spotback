@@ -34,7 +34,9 @@ export async function GET(req: NextRequest) {
   // Credentials must be passed from the client via the state parameter.
   if (state) {
     try {
-      const decodedState = JSON.parse(atob(state));
+      // Use Buffer.from for server-side base64 decoding, as atob is not available in Node.js
+      const decodedStateString = Buffer.from(state, 'base64').toString('ascii');
+      const decodedState = JSON.parse(decodedStateString);
       if (decodedState.clientId && decodedState.clientSecret) {
         clientId = decodedState.clientId;
         clientSecret = decodedState.clientSecret;
