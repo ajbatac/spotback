@@ -17,6 +17,7 @@ SpotBack is a web application built with Next.js that allows users to securely c
   - [Build](#build)
   - [Firebase App Hosting](#firebase-app-hosting)
 - [Troubleshooting](#troubleshooting)
+- [Credits](#credits)
 
 ---
 
@@ -167,3 +168,9 @@ The `apphosting.yaml` file configures the deployment settings for Firebase.
 - **Docker Build Fails**: Ensure Docker is running and that you have sufficient permissions to run Docker commands.
 
 - **Favicon Errors**: The application uses `src/app/icon.tsx` to generate the favicon, which is the recommended method for the Next.js App Router. If you see conflicts, ensure you do not have a `favicon.ico` file in the `public/` or `src/app/` directories.
+
+---
+
+## Credits
+
+This project was created and is maintained with ❤️ by **[AJ Batac (@ajbatac)](https://www.instagram.com/ajbatac)**.
