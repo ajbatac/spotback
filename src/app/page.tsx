@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 function HomePageContent() {
@@ -9,34 +9,54 @@ function HomePageContent() {
   const accessToken = searchParams.get('access_token');
   const error = searchParams.get('error');
 
-  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const [spotifyAuthUrl, setSpotifyAuthUrl] = useState('');
+  const [redirectUri, setRedirectUri] = useState('');
+  const [configError, setConfigError] = useState('');
 
-  if (!appUrl || !clientId) {
-    return (
-      <div>
-        <h1>Error: Application is not configured correctly.</h1>
-        <p>
-          Please ensure <code>NEXT_PUBLIC_APP_URL</code> and <code>NEXT_PUBLIC_SPOTIFY_CLIENT_ID</code> are set.
-        </p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        const response = await fetch('/api/config');
+        if (!response.ok) {
+          throw new Error('Failed to fetch server configuration');
+        }
+        const config = await response.json();
+        
+        if (config.error) {
+            throw new Error(config.error);
+        }
 
-  const redirectUri = `${appUrl}/api/auth/callback/spotify`;
-  const scopes = [
-    'user-read-private',
-    'user-read-email',
-    'playlist-read-private',
-    'playlist-read-collaborative',
-    'user-top-read',
-  ].join(' ');
+        const { appUrl, clientId } = config;
 
-  const spotifyAuthUrl = new URL('https://accounts.spotify.com/authorize');
-  spotifyAuthUrl.searchParams.append('response_type', 'code');
-  spotifyAuthUrl.searchParams.append('client_id', clientId);
-  spotifyAuthUrl.searchParams.append('scope', scopes);
-  spotifyAuthUrl.searchParams.append('redirect_uri', redirectUri);
+        if (!appUrl || !clientId) {
+            throw new Error('Required configuration (URL or Client ID) is missing.');
+        }
+
+        const scopes = [
+          'user-read-private',
+          'user-read-email',
+          'playlist-read-private',
+          'playlist-read-collaborative',
+          'user-top-read',
+        ].join(' ');
+
+        const constructedRedirectUri = `${appUrl}/api/auth/callback/spotify`;
+        setRedirectUri(constructedRedirectUri);
+
+        const authUrl = new URL('https://accounts.spotify.com/authorize');
+        authUrl.searchParams.append('response_type', 'code');
+        authUrl.searchParams.append('client_id', clientId);
+        authUrl.searchParams.append('scope', scopes);
+        authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
+        setSpotifyAuthUrl(authUrl.toString());
+
+      } catch (e: any) {
+        setConfigError(e.message || 'An unknown error occurred while fetching config.');
+      }
+    }
+
+    fetchConfig();
+  }, []);
 
   if (accessToken) {
     return (
@@ -62,6 +82,16 @@ function HomePageContent() {
     );
   }
 
+  if (configError) {
+      return (
+          <div>
+              <h1>Configuration Error</h1>
+              <p>Could not initialize the application:</p>
+              <pre><code>{configError}</code></pre>
+          </div>
+      )
+  }
+
   return (
     <div>
       <h1>Spotify Barebones Login</h1>
@@ -76,7 +106,7 @@ function HomePageContent() {
         <strong>URL to call:</strong>
       </p>
       <pre>
-        <code>{spotifyAuthUrl.toString()}</code>
+        <code>{spotifyAuthUrl || 'Loading...'}</code>
       </pre>
 
       <hr />
@@ -87,18 +117,22 @@ function HomePageContent() {
         <strong>Callback URL:</strong>
       </p>
       <pre>
-        <code>{redirectUri}</code>
+        <code>{redirectUri || 'Loading...'}</code>
       </pre>
       <p><em>(You must add this exact URL to your allowed Redirect URIs in the Spotify Developer Dashboard)</em></p>
 
       <hr />
 
       <h2>3. Initiate Login</h2>
-      <p>
-        <a href={spotifyAuthUrl.toString()}>
-          Login with Spotify
-        </a>
-      </p>
+      {spotifyAuthUrl ? (
+        <p>
+          <a href={spotifyAuthUrl}>
+            Login with Spotify
+          </a>
+        </p>
+      ) : (
+        <p>Loading login link...</p>
+      )}
     </div>
   );
 }
