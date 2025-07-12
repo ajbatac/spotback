@@ -24,6 +24,7 @@ SpotBack is a web application built with Next.js that allows users to securely c
 - **Selective Backup**: Choose one, multiple, or all playlists to back up.
 - **Multiple Export Formats**: Export playlists in their official JSON format, as XML, or as a simple TXT file of playlist URLs.
 - **Responsive Design**: Fully functional on both desktop and mobile devices.
+- **Consistent UI**: Uniform styling and icons for all primary buttons and actions.
 - **AI-Powered Metadata Organization**: (Coming Soon) Utilizes Genkit to process and enhance playlist metadata for better readability.
 
 ## Tech Stack
@@ -77,7 +78,7 @@ The project follows a standard Next.js App Router structure, with logical separa
 - **`src/components/Dashboard.tsx`**: The main application interface for authenticated users. It fetches data, manages the state for playlist selection, and handles the multi-step backup and download process.
 - **`src/components/Header.tsx`**: A responsive header that displays the application logo, the logged-in user's name and profile picture, and a logout button.
 - **`src/components/PlaylistCard.tsx`**: A component that displays a single playlist's cover art, name, owner, and track count, along with an interactive checkbox for selection.
-- **`src/components/Footer.tsx`**: A simple site-wide footer that displays copyright and credit information.
+- **`src/components/Footer.tsx`**: A site-wide footer containing a link to support the creator, copyright info, and a link to the project's changelog.
 
 
 ## Can I Restore My Backup to Another Account?
