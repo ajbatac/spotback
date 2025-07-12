@@ -1,13 +1,18 @@
+
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-// This component now renders a minimal page to demonstrate the Spotify auth flow.
-export default function Home() {
+function HomePageContent() {
+  const searchParams = useSearchParams();
+  const accessToken = searchParams.get('access_token');
+  const error = searchParams.get('error');
+
   // These values MUST be set in your .env file for the authentication to work.
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-  
+
   // If the app url isn't set, we must show an error.
   if (!appUrl) {
     return (
@@ -19,7 +24,7 @@ export default function Home() {
       </div>
     );
   }
-  
+
   // This is the specific callback endpoint that will handle the response from Spotify.
   // It MUST be added to your Spotify application's "Redirect URIs" in the Spotify Developer Dashboard.
   const redirectUri = `${appUrl}/api/auth/callback/spotify`;
@@ -35,7 +40,7 @@ export default function Home() {
 
   // We construct the full authorization URL.
   const spotifyAuthUrl = new URL('https://accounts.spotify.com/authorize');
-  
+
   if (clientId) {
     spotifyAuthUrl.searchParams.append('response_type', 'code');
     spotifyAuthUrl.searchParams.append('client_id', clientId);
@@ -56,10 +61,34 @@ export default function Home() {
     );
   }
 
+  if (accessToken) {
+    return (
+      <div>
+        <h1>Login Successful!</h1>
+        <p>Your Spotify Access Token is:</p>
+        <pre><code style={{wordBreak: 'break-all'}}>{accessToken}</code></pre>
+        <hr />
+        <a href="/">Start Over</a>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <h1>Login Failed</h1>
+        <p>Spotify returned an error:</p>
+        <pre><code>{error}</code></pre>
+        <hr />
+        <a href="/">Try Again</a>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1>Spotify Barebones Login</h1>
-      
+
       <hr />
 
       <h2>1. The Call We Will Make</h2>
@@ -84,7 +113,7 @@ export default function Home() {
         <code>{redirectUri}</code>
       </pre>
       <p><em>(You must add this exact URL to your allowed Redirect URIs in the Spotify Developer Dashboard)</em></p>
-      
+
       <hr />
 
       <h2>3. Initiate Login</h2>
@@ -95,4 +124,14 @@ export default function Home() {
       </p>
     </div>
   );
+}
+
+
+// The root page now uses Suspense to wait for client-side search param reading
+export default function Home() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <HomePageContent />
+        </Suspense>
+    );
 }
