@@ -4,16 +4,15 @@
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-function HomePageContent() {
+// This is now a CLIENT component that receives the appUrl as a prop.
+function HomePageContent({ appUrl }: { appUrl?: string }) {
   const searchParams = useSearchParams();
   const accessToken = searchParams.get('access_token');
   const error = searchParams.get('error');
 
-  // These values MUST be set in your .env file for the authentication to work.
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-  // If the app url isn't set, we must show an error.
+  // If the app url isn't set (passed from the server component), we must show an error.
   if (!appUrl) {
     return (
       <div>
@@ -127,11 +126,15 @@ function HomePageContent() {
 }
 
 
-// The root page now uses Suspense to wait for client-side search param reading
+// This is the main export, a SERVER component that wraps the client component.
 export default function Home() {
+    // We can safely read the environment variable here on the server.
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+    // We wrap the client component in Suspense to allow it to read search params.
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <HomePageContent />
+            <HomePageContent appUrl={appUrl} />
         </Suspense>
     );
 }
