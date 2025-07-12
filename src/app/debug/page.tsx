@@ -14,6 +14,7 @@ export default function DebugPage() {
   const [isClient, setIsClient] = useState(false);
   const [spotifyAuthUrl, setSpotifyAuthUrl] = useState('');
   const [loginConfigError, setLoginConfigError] = useState('');
+  const [scopes, setScopes] = useState<string[]>([]);
 
   useEffect(() => {
     // This effect runs only on the client, after the initial render.
@@ -50,19 +51,20 @@ export default function DebugPage() {
         }
         const { appUrl, clientId } = config;
 
-        const scopes = [
+        const requestedScopes = [
           'user-read-private',
           'user-read-email',
           'playlist-read-private',
           'playlist-read-collaborative',
           'user-top-read',
-        ].join(' ');
+        ];
+        setScopes(requestedScopes);
 
         const constructedRedirectUri = `${appUrl}/api/auth/callback/spotify`;
         const authUrl = new URL('https://accounts.spotify.com/authorize');
         authUrl.searchParams.append('response_type', 'code');
         authUrl.searchParams.append('client_id', clientId);
-        authUrl.searchParams.append('scope', scopes);
+        authUrl.searchParams.append('scope', requestedScopes.join(' '));
         authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
         setSpotifyAuthUrl(authUrl.toString());
     } catch (e: any) {
@@ -107,26 +109,54 @@ export default function DebugPage() {
               </div>
               {accessToken ? (
                 <Button variant="destructive" size="sm" onClick={logout} className="mt-2">Logout</Button>
-              ) : loginConfigError ? (
-                 <div className="text-red-500 bg-red-100 p-2 rounded-md text-xs mt-2">
-                    <p className="font-bold">Could not generate login URL:</p>
-                    <p>{loginConfigError}</p>
-                 </div>
-              ) : spotifyAuthUrl ? (
-                <Button size="sm" asChild className="mt-2">
-                  <a href={spotifyAuthUrl}>
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Login with Spotify
-                  </a>
-                </Button>
               ) : (
-                 <Button size="sm" disabled className="mt-2">Loading Login...</Button>
+                 <div className="mt-2 space-y-4">
+                  {loginConfigError ? (
+                      <div className="text-red-500 bg-red-100 p-2 rounded-md text-xs">
+                          <p className="font-bold">Could not generate login URL:</p>
+                          <p>{loginConfigError}</p>
+                      </div>
+                  ) : spotifyAuthUrl ? (
+                      <Button size="sm" asChild>
+                          <a href={spotifyAuthUrl}>
+                              <LogIn className="mr-2 h-4 w-4" />
+                              Login with Spotify
+                          </a>
+                      </Button>
+                  ) : (
+                      <Button size="sm" disabled>Loading Login...</Button>
+                  )}
+                 </div>
               )}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">Loading auth state...</p>
           )}
         </section>
+
+        {/* Login URL Details Section */}
+        <section className="mb-8 p-4 border rounded-lg bg-white shadow-sm">
+          <h2 className="text-xl font-semibold mb-3 text-gray-700 border-b pb-2">Spotify Login URL Details</h2>
+          <div className="space-y-3 text-sm">
+            <div>
+              <h3 className="font-semibold text-gray-600">Requested Scopes:</h3>
+              {scopes.length > 0 ? (
+                <ul className="list-disc list-inside mt-1 space-y-1">
+                  {scopes.map(scope => <li key={scope}><code className="bg-gray-100 p-1 rounded text-blue-700">{scope}</code></li>)}
+                </ul>
+              ) : (
+                <p className="text-muted-foreground">No scopes generated yet...</p>
+              )}
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-600">Constructed Auth URL:</h3>
+              <pre className="mt-1 p-2 bg-gray-100 rounded text-xs break-all overflow-auto">
+                {spotifyAuthUrl || 'No URL generated yet...'}
+              </pre>
+            </div>
+          </div>
+        </section>
+
 
         {/* API Response Section */}
         <section className="p-4 border rounded-lg bg-white shadow-sm">
