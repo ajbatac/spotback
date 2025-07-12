@@ -37,7 +37,7 @@ SpotBack is a web application built with Next.js that allows users to securely c
 
 ## Tech Stack
 
-- **Framework**: [Next.js](https://nextjs.org/) (v15.3) with App Router
+- **Framework**: [Next.js](https://nextjs.org/) (v14) with App Router
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/) for pre-built components.
 - **AI Integration**: [Genkit](https://firebase.google.com/docs/genkit) for generative AI flows.
@@ -77,22 +77,22 @@ The project follows a standard Next.js App Router structure, with logical separa
 │   │   └── utils.ts        # Utility functions (e.g., `cn` for Tailwind)
 │   └── types/
 │       └── spotify.d.ts    # TypeScript type definitions for Spotify API objects
-├── .env.example            # Example environment variables
+├── .env                    # Environment variables (MUST BE CREATED)
 ├── Dockerfile.dev          # Dockerfile for development
 ├── Dockerfile.prod         # Dockerfile for production
 ├── docker-compose.yml      # Docker Compose for easy development setup
-├── next.config.ts          # Next.js configuration
+├── next.config.js          # Next.js configuration
 ├── package.json            # Project dependencies and scripts
 └── README.md               # This file
 ```
 
 ## Key Components & Functionality
 
-- **`src/app/page.tsx`**: The main entry point of the UI. It handles the core logic: authentication state, data fetching from Spotify, user interaction (selecting playlists), and triggering the export process.
-- **`src/app/api/auth/callback/spotify/route.ts`**: The server-side API route that handles the OAuth 2.0 callback from Spotify. It exchanges the authorization code for an access token and securely redirects the user back to the main application.
-- **`src/lib/spotify.ts`**: A collection of server-side functions that act as a client for the Spotify Web API. It includes functions for fetching user profiles, playlists, and top artists, with built-in error handling for API responses.
-- **`src/context/auth-context.tsx`**: A React Context provider that manages the Spotify access token. It uses the `use-local-storage` hook to persist the token, keeping the user logged in across browser sessions.
-- **`src/components/playlist-card.tsx`**: A UI component that displays a single playlist's cover art, name, and track count, and handles its selection state.
+- **`src/app/page.tsx`**: The main entry point of the UI. It acts as a controller that uses the `AuthContext` to determine the user's login state. It will render either a `LoginPage` component if the user is logged out, or the main `Dashboard` component if the user is authenticated. It also handles the one-time logic of receiving the access token from the URL after the Spotify redirect.
+- **`src/app/api/auth/callback/spotify/route.ts`**: The server-side API route that handles the OAuth 2.0 callback from Spotify. It exchanges the authorization code for an access token and securely redirects the user back to the main application page with the token in the URL parameters.
+- **`src/context/auth-context.tsx`**: A React Context provider that manages the global authentication state. It has the **single responsibility** of holding the Spotify access token. It uses the `use-local-storage` hook to persist the token, keeping the user logged in across browser sessions. This decouples the auth state management from the components that use it.
+- **`src/hooks/use-local-storage.ts`**: A generic custom hook that abstracts the logic of interacting with the browser's `localStorage`. This allows any piece of state to be persisted without rewriting boilerplate code, adhering to the **Don't Repeat Yourself (DRY)** principle.
+- **`src/lib/spotify.ts`**: A collection of server-side functions that act as a client for the Spotify Web API. It will include functions for fetching user profiles, playlists, and top artists, with built-in error handling for API responses.
 - **`src/ai/flows/organize-playlist-metadata.ts`**: A Genkit flow that takes raw playlist metadata and uses an AI model to return a well-structured and readable version.
 
 ## Project Dependencies
@@ -101,8 +101,8 @@ Here is a list of the primary dependencies used in this project:
 
 | Package               | Version    | Description                                                 |
 | --------------------- | ---------- | ----------------------------------------------------------- |
-| `next`                | `15.3.3`   | The React framework for building the application.           |
-| `react`               | `18.3.1`   | A JavaScript library for building user interfaces.          |
+| `next`                | `14.2.0`   | The React framework for building the application.           |
+| `react`               | `18.2.0`   | A JavaScript library for building user interfaces.          |
 | `typescript`          | `^5`       | A typed superset of JavaScript that compiles to plain JS.   |
 | `tailwindcss`         | `^3.4.1`   | A utility-first CSS framework for rapid UI development.     |
 | `@shadcn/ui`          | various    | A collection of beautifully designed, reusable components.  |
@@ -114,7 +114,7 @@ Here is a list of the primary dependencies used in this project:
 
 ## Environment Variables
 
-To run this project, you need to create a `.env` file in the root of the project and add the following environment variables. You can get Spotify credentials by creating an app on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
+To run this project, you **must** create a `.env` file in the root of the project and add the following environment variables. You can get Spotify credentials by creating an app on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
 
 ```bash
 # .env
@@ -133,8 +133,6 @@ NEXT_PUBLIC_APP_URL="http://127.0.0.1:9002"
 # Optional: Google AI API Key for Genkit
 # GOOGLE_API_KEY="YOUR_GOOGLE_AI_API_KEY"
 ```
-
-See `.env.example` for a template.
 
 ## Getting Started (Local Development)
 
@@ -159,7 +157,7 @@ See `.env.example` for a template.
 
 3.  **Set up environment variables:**
     - Create a file named `.env` in the project root.
-    - Copy the contents from `.env.example` and fill in your Spotify credentials.
+    - Copy the contents from the section above and fill in your Spotify credentials.
     - **Important**: Make sure the `Redirect URI` in your Spotify app settings matches `NEXT_PUBLIC_APP_URL` + `/api/auth/callback/spotify`.
 
 4.  **Run the development server:**
@@ -259,4 +257,3 @@ The frontend, unable to connect to the crashing API route, displayed a generic `
 
 **The Corrective Action and Core Takeaway:**
 The final, correct fix was simple: create the `.env` file and populate it with the required variables. When encountering a `Failed to fetch` error for an internal API, **the first step must always be to check the server-side logs and validate the health of the API endpoint itself**, rather than assuming the problem lies within the client-side code making the request.
-
