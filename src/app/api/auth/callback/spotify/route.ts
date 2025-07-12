@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
   const redirectUri = `${appUrl}/api/auth/callback/spotify`;
 
   if (!clientId || !clientSecret) {
-    const error_msg = "Server misconfiguration: Spotify credentials not set.";
+    const error_msg = "Server misconfiguration: Spotify credentials not set. Check server environment variables.";
     rootUrl.searchParams.set('error', error_msg);
     return NextResponse.redirect(rootUrl);
   }
