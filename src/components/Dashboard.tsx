@@ -18,6 +18,7 @@ import {
   FileText,
 } from 'lucide-react';
 import fileDownload from 'js-file-download';
+import { Footer } from './Footer';
 
 export function Dashboard() {
   const { accessToken, setUser } = useAuth();
@@ -163,9 +164,9 @@ export function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-grow">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <div className="flex items-center space-x-3">
@@ -250,6 +251,7 @@ export function Dashboard() {
           ))}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

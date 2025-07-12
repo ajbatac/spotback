@@ -6,6 +6,7 @@ import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
 import { Music } from 'lucide-react';
 import { Dashboard } from '@/components/Dashboard';
+import { Footer } from '@/components/Footer';
 
 function LoginPage() {
   const [spotifyAuthUrl, setSpotifyAuthUrl] = useState('');
@@ -48,36 +49,39 @@ function LoginPage() {
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-8 pt-20">
-      <div className="flex flex-col items-center justify-center text-center space-y-6 max-w-lg mx-auto">
-        <div className="bg-primary/20 p-4 rounded-full">
-          <Music className="w-12 h-12 text-primary" />
-        </div>
-        <h1 className="text-5xl font-bold tracking-tight text-gray-800">
-          Spot<span className="text-primary">Back</span>
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Your personal Spotify assistant. Easily back up your playlists and musical memories in just a few clicks.
-        </p>
+    <>
+      <main className="flex flex-col items-center p-8 pt-20">
+        <div className="flex flex-col items-center justify-center text-center space-y-6 max-w-lg mx-auto">
+          <div className="bg-primary/20 p-4 rounded-full">
+            <Music className="w-12 h-12 text-primary" />
+          </div>
+          <h1 className="text-5xl font-bold tracking-tight text-gray-800">
+            Spot<span className="text-primary">Back</span>
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Your personal Spotify assistant. Easily back up your playlists and musical memories in just a few clicks.
+          </p>
 
-        {configError ? (
-           <div className="text-red-500 bg-red-100 p-4 rounded-md">
-             <p className="font-bold">Configuration Error</p>
-             <p>{configError}</p>
-           </div>
-        ) : spotifyAuthUrl ? (
-          <Button size="lg" asChild className="shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
-            <a href={spotifyAuthUrl}>
-              Login with Spotify
-            </a>
-          </Button>
-        ) : (
-          <Button size="lg" disabled className="shadow-lg">
-            Loading...
-          </Button>
-        )}
-      </div>
-    </main>
+          {configError ? (
+            <div className="text-red-500 bg-red-100 p-4 rounded-md">
+              <p className="font-bold">Configuration Error</p>
+              <p>{configError}</p>
+            </div>
+          ) : spotifyAuthUrl ? (
+            <Button size="lg" asChild className="shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+              <a href={spotifyAuthUrl}>
+                Login with Spotify
+              </a>
+            </Button>
+          ) : (
+            <Button size="lg" disabled className="shadow-lg">
+              Loading...
+            </Button>
+          )}
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }
 
