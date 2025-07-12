@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/Footer';
@@ -14,6 +14,22 @@ export default function CredentialsPage() {
   const { setCredentials } = useAuth();
   const [clientId, setClientId] = useState('');
   const [clientSecret, setClientSecret] = useState('');
+  const [redirectUri, setRedirectUri] = useState('');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+    if (appUrl) {
+        try {
+            const callbackUrl = new URL('/api/auth/callback/spotify', appUrl);
+            setRedirectUri(callbackUrl.toString());
+        } catch (e) {
+            console.error("Invalid NEXT_PUBLIC_APP_URL", e);
+            setRedirectUri("Error: Invalid App URL configured.")
+        }
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,12 +96,16 @@ export default function CredentialsPage() {
             <p className="text-muted-foreground text-sm">
               Due to Spotify's developer policy, you must use your own API keys. This ensures all data access is explicitly approved by you, for you. Your keys are stored securely in your browser and are never saved on our server.
             </p>
-            <ol className="list-decimal list-inside text-muted-foreground text-sm space-y-1 mt-2">
+            <ol className="list-decimal list-inside text-muted-foreground text-sm space-y-2 mt-3">
                 <li>Go to the <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Spotify Developer Dashboard</a> and log in.</li>
                 <li>Click "Create App" and give it a name and description.</li>
                 <li>Once created, you will see your <strong>Client ID</strong> and <strong>Client Secret</strong>. Copy them into the form above.</li>
-                <li>Go to "App Settings" and add a "Redirect URI": <strong>{process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback/spotify</strong></li>
-                <li>Finally, go to the "Users and Access" tab and add the email address of your Spotify account to the list of users.</li>
+                <li>Go to "App Settings" and add this exact "Redirect URI":
+                    <div className="p-2 my-1 bg-gray-100 rounded-md font-mono text-xs break-all">
+                       {isClient ? <strong>{redirectUri}</strong> : 'Loading...'}
+                    </div>
+                </li>
+                <li>Finally, go to the "Users and Access" tab and add the email address of your Spotify account to the list of users. This is required for apps in Development Mode.</li>
             </ol>
             <div className="text-center mt-4">
                 <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-primary hover:underline">
