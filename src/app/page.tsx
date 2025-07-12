@@ -3,6 +3,8 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
+import { Button } from '@/components/ui/button';
+import { Music } from 'lucide-react';
 
 function LoginPage() {
   const [spotifyAuthUrl, setSpotifyAuthUrl] = useState('');
@@ -44,26 +46,37 @@ function LoginPage() {
     fetchConfig();
   }, []);
 
-  if (configError) {
-    return (
-      <div>
-        <h1>Configuration Error</h1>
-        <p>Could not initialize the application:</p>
-        <pre><code>{configError}</code></pre>
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <h1>SpotBack</h1>
-      <p>Backup your Spotify playlists.</p>
-      {spotifyAuthUrl ? (
-        <a href={spotifyAuthUrl}>Login with Spotify</a>
-      ) : (
-        <p>Loading login link...</p>
-      )}
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-center p-8">
+      <div className="flex flex-col items-center justify-center text-center space-y-6 max-w-lg mx-auto">
+        <div className="bg-primary/20 p-4 rounded-full">
+          <Music className="w-12 h-12 text-primary" />
+        </div>
+        <h1 className="text-5xl font-bold tracking-tight text-gray-800">
+          Spot<span className="text-primary">Back</span>
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          Your personal Spotify assistant. Easily back up your playlists and musical memories in just a few clicks.
+        </p>
+
+        {configError ? (
+           <div className="text-red-500 bg-red-100 p-4 rounded-md">
+             <p className="font-bold">Configuration Error</p>
+             <p>{configError}</p>
+           </div>
+        ) : spotifyAuthUrl ? (
+          <Button size="lg" asChild className="shadow-lg">
+            <a href={spotifyAuthUrl}>
+              Login with Spotify
+            </a>
+          </Button>
+        ) : (
+          <Button size="lg" disabled className="shadow-lg">
+            Loading...
+          </Button>
+        )}
+      </div>
+    </main>
   );
 }
 
@@ -77,7 +90,7 @@ function Dashboard() {
       <p>
         <strong>Access Token:</strong> <code style={{ wordBreak: 'break-all' }}>{accessToken}</code>
       </p>
-      <button onClick={logout}>Logout</button>
+      <Button onClick={logout}>Logout</Button>
     </div>
   );
 }
@@ -109,18 +122,19 @@ function HomePageContent() {
 
   if (error) {
     return (
-      <div>
-        <h1>Login Failed</h1>
-        <p>Spotify returned an error:</p>
-        <pre><code>{error}</code></pre>
-        <hr />
-        <a href="/">Try Again</a>
+      <div className="flex min-h-screen flex-col items-center justify-center text-center p-8">
+        <h1 className="text-2xl font-bold text-red-600">Login Failed</h1>
+        <p className="text-muted-foreground mt-2">Spotify returned an error:</p>
+        <pre className="mt-4 p-4 bg-gray-100 rounded-md text-sm text-left"><code>{error}</code></pre>
+        <Button asChild variant="link" className="mt-4">
+          <a href="/">Try Again</a>
+        </Button>
       </div>
     );
   }
   
   if (!isClient) {
-    // Render nothing or a loading spinner on the server and initial client render
+    // Render nothing on the server and initial client render to avoid hydration mismatch
     return null;
   }
   
@@ -129,7 +143,7 @@ function HomePageContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={null}>
       <HomePageContent />
     </Suspense>
   );
