@@ -2,12 +2,12 @@
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import type { Playlist } from '@/lib/spotify';
+import type { SpotifyPlaylist } from '@/lib/spotify';
 import { cn } from '@/lib/utils';
 import { Music2 } from 'lucide-react';
 
 interface PlaylistCardProps {
-  playlist: Playlist;
+  playlist: SpotifyPlaylist;
   isSelected: boolean;
   onSelect: (playlistId: string, isSelected: boolean) => void;
 }

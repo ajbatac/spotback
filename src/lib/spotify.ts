@@ -1,15 +1,6 @@
-export interface Playlist {
-    id: string;
-    name: string;
-    description: string;
-    images: { url: string }[];
-    tracks: {
-        total: number;
-    };
-    owner: {
-        display_name: string;
-    }
-}
+import type { Playlist } from 'spotify-api';
+
+export type { Playlist as SpotifyPlaylist };
 
 async function fetchAllPages<T>(initialUrl: string, accessToken: string): Promise<T[]> {
     let items: T[] = [];
@@ -37,5 +28,8 @@ async function fetchAllPages<T>(initialUrl: string, accessToken: string): Promis
 
 export async function getPlaylists(accessToken: string): Promise<Playlist[]> {
     const initialUrl = 'https://api.spotify.com/v1/me/playlists?limit=50';
+    // The spotify-api type for /me/playlists is PagingObject<PlaylistObjectSimplified>
+    // but we are casting to the full Playlist type which is a superset and mostly compatible.
+    // The API returns simplified playlist objects here.
     return await fetchAllPages<Playlist>(initialUrl, accessToken);
 }

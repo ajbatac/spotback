@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { getPlaylists, type Playlist } from '@/lib/spotify';
+import { getPlaylists, type SpotifyPlaylist } from '@/lib/spotify';
 import { Header } from '@/components/Header';
 import { PlaylistCard } from '@/components/PlaylistCard';
 import { Button } from '@/components/ui/button';
@@ -13,13 +13,13 @@ import fileDownload from 'js-file-download';
 
 export function Dashboard() {
   const { accessToken } = useAuth();
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [selectedPlaylists, setSelectedPlaylists] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [backupComplete, setBackupComplete] = useState(false);
-  const [backedUpPlaylists, setBackedUpPlaylists] = useState<Playlist[]>([]);
+  const [backedUpPlaylists, setBackedUpPlaylists] = useState<SpotifyPlaylist[]>([]);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -38,8 +38,8 @@ export function Dashboard() {
     fetchPlaylists();
   }, [accessToken]);
 
-  const handleSelectAll = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
+  const handleSelectAll = (checked: boolean | 'indeterminate') => {
+    if (checked === true) {
       const allPlaylistIds = new Set(playlists.map(p => p.id));
       setSelectedPlaylists(allPlaylistIds);
     } else {
@@ -58,19 +58,41 @@ export function Dashboard() {
   };
 
   const jsonToXml = (json: object): string => {
-    let xml = '<playlist>\n';
-    for (const key in json) {
-      if (Object.prototype.hasOwnProperty.call(json, key)) {
-        const value = (json as any)[key];
-        if (typeof value === 'object' && value !== null) {
-          xml += `  <${key}>${jsonToXml(value)}</${key}>\n`;
-        } else {
-          xml += `  <${key}>${value}</${key}>\n`;
+    let xml = '';
+    const convert = (obj: any, indent: string) => {
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const value = obj[key];
+                const tag = key.replace(/[^a-zA-Z0-9_]/g, '_'); // Basic sanitization for tag names
+
+                if (value === null || value === undefined) {
+                    xml += `${indent}<${tag}/>\n`;
+                } else if (typeof value === 'object') {
+                    if (Array.isArray(value)) {
+                        value.forEach(item => {
+                            xml += `${indent}<${tag}>\n`;
+                            convert(item, indent + '  ');
+                            xml += `${indent}</${tag}>\n`;
+                        });
+                    } else {
+                        xml += `${indent}<${tag}>\n`;
+                        convert(value, indent + '  ');
+                        xml += `${indent}</${tag}>\n`;
+                    }
+                } else {
+                    const escapedValue = String(value)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&apos;');
+                    xml += `${indent}<${tag}>${escapedValue}</${tag}>\n`;
+                }
+            }
         }
-      }
-    }
-    xml += '</playlist>';
-    return xml;
+    };
+    convert(json, '  ');
+    return `<playlists>\n${xml}</playlists>`;
   };
   
   const handleBackup = () => {
@@ -87,11 +109,11 @@ export function Dashboard() {
   };
 
   const handleDownload = (format: 'json' | 'xml') => {
-    const dataToDownload = JSON.stringify(backedUpPlaylists, null, 2);
     if (format === 'json') {
+      const dataToDownload = JSON.stringify(backedUpPlaylists, null, 2);
       fileDownload(dataToDownload, `spotify_backup_${new Date().toISOString()}.json`);
     } else if (format === 'xml') {
-      const xmlData = jsonToXml({ playlists: backedUpPlaylists });
+      const xmlData = jsonToXml({ playlist: backedUpPlaylists });
       fileDownload(xmlData, `spotify_backup_${new Date().toISOString()}.xml`);
     }
   };
@@ -128,8 +150,8 @@ export function Dashboard() {
             <div className="flex items-center space-x-3">
               <Checkbox 
                 id="select-all" 
-                onCheckedChange={(checked) => handleSelectAll({ target: { checked } } as any)}
-                checked={selectedPlaylists.size > 0 && selectedPlaylists.size === playlists.length}
+                onCheckedChange={handleSelectAll}
+                checked={playlists.length > 0 && (selectedPlaylists.size === playlists.length ? true : selectedPlaylists.size === 0 ? false : 'indeterminate')}
               />
               <Label htmlFor="select-all" className="text-lg font-medium">
                 Select All Playlists
