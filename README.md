@@ -13,11 +13,8 @@ SpotBack is a web application built with Next.js that allows users to securely c
 - [Getting Started (Local Development)](#getting-started-local-development)
   - [Prerequisites](#prerequisites)
   - [Manual Setup](#manual-setup)
-  - [Docker Setup](#docker-setup)
 - [Building for Production](#building-for-production)
 - [Deployment](#deployment)
-  - [Using Docker](#using-docker)
-  - [Firebase App Hosting](#firebase-app-hosting)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -25,14 +22,11 @@ SpotBack is a web application built with Next.js that allows users to securely c
 ## Features
 
 - **Secure Spotify OAuth 2.0 Login**: Connect your Spotify account securely.
-- **Playlist & Top Artist Display**: View all your public and private playlists, along with your top artists.
-- **Selective Backup**: Choose one, multiple, or all playlists to back up.
-- **Multiple Export Formats**:
-  - **CSV**: A simple, universal format for track data.
-  - **JSON**: A simplified JSON format, great for custom scripts.
-  - **ZIP**: A compressed archive containing a separate CSV file for each selected playlist.
-  - **Spotify API Format**: A complete JSON export matching the official Spotify API response, perfect for archival or programmatic use.
-- **AI-Powered Metadata Organization**: Utilizes Genkit to process and enhance playlist metadata for better readability.
+- **Beautiful, Responsive Landing Page**: A clean and simple interface for new users.
+- **Playlist & Top Artist Display**: (Coming Soon) View all your public and private playlists, along with your top artists.
+- **Selective Backup**: (Coming Soon) Choose one, multiple, or all playlists to back up.
+- **Multiple Export Formats**: (Coming Soon)
+- **AI-Powered Metadata Organization**: (Coming Soon) Utilizes Genkit to process and enhance playlist metadata for better readability.
 - **Responsive Design**: Fully functional on both desktop and mobile devices.
 
 ## Tech Stack
@@ -42,7 +36,6 @@ SpotBack is a web application built with Next.js that allows users to securely c
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/) for pre-built components.
 - **AI Integration**: [Genkit](https://firebase.google.com/docs/genkit) for generative AI flows.
 - **Authentication**: OAuth 2.0 with the Spotify Web API.
-- **Containerization**: [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
 
 ## Project Structure
 
@@ -51,36 +44,28 @@ The project follows a standard Next.js App Router structure, with logical separa
 ```
 .
 ├── public/
-│   └── bmc-button.html     # Isolated HTML for the "Buy Me a Pizza" widget
-│   └── spotify.png         # App logo
+│   └── (empty)
 ├── src/
-│   ├── ai/
-│   │   ├── flows/
-│   │   │   └── ...ts       # Genkit flows for AI functionality
-│   │   └── genkit.ts       # Genkit AI instance configuration
 │   ├── app/
 │   │   ├── api/
-│   │   │   └── ...ts       # API routes (e.g., Spotify OAuth callback)
+│   │   │   ├── auth/
+│   │   │   │   └── callback/
+│   │   │   │       └── spotify/
+│   │   │   │           └── route.ts
+│   │   │   └── config/
+│   │   │       └── route.ts
 │   │   ├── globals.css     # Global styles and Tailwind directives
 │   │   ├── layout.tsx      # Root layout for the application
 │   │   └── page.tsx        # The main page component
 │   ├── components/
-│   │   ├── ui/             # Reusable UI components from shadcn/ui
-│   │   └── *.tsx           # Custom application-specific components
+│   │   └── ui/             # Reusable UI components from shadcn/ui
 │   ├── context/
 │   │   └── auth-context.tsx # React context for managing auth state
 │   ├── hooks/
-│   │   ├── use-local-storage.ts # Hook for persisting state to localStorage
-│   │   └── ...ts           # Other custom React hooks
+│   │   └── use-local-storage.ts # Hook for persisting state to localStorage
 │   ├── lib/
-│   │   ├── spotify.ts      # Functions for interacting with the Spotify API
 │   │   └── utils.ts        # Utility functions (e.g., `cn` for Tailwind)
-│   └── types/
-│       └── spotify.d.ts    # TypeScript type definitions for Spotify API objects
 ├── .env                    # Environment variables (MUST BE CREATED)
-├── Dockerfile.dev          # Dockerfile for development
-├── Dockerfile.prod         # Dockerfile for production
-├── docker-compose.yml      # Docker Compose for easy development setup
 ├── next.config.js          # Next.js configuration
 ├── package.json            # Project dependencies and scripts
 └── README.md               # This file
@@ -92,8 +77,8 @@ The project follows a standard Next.js App Router structure, with logical separa
 - **`src/app/api/auth/callback/spotify/route.ts`**: The server-side API route that handles the OAuth 2.0 callback from Spotify. It exchanges the authorization code for an access token and securely redirects the user back to the main application page with the token in the URL parameters.
 - **`src/context/auth-context.tsx`**: A React Context provider that manages the global authentication state. It has the **single responsibility** of holding the Spotify access token. It uses the `use-local-storage` hook to persist the token, keeping the user logged in across browser sessions. This decouples the auth state management from the components that use it.
 - **`src/hooks/use-local-storage.ts`**: A generic custom hook that abstracts the logic of interacting with the browser's `localStorage`. This allows any piece of state to be persisted without rewriting boilerplate code, adhering to the **Don't Repeat Yourself (DRY)** principle.
-- **`src/lib/spotify.ts`**: A collection of server-side functions that act as a client for the Spotify Web API. It will include functions for fetching user profiles, playlists, and top artists, with built-in error handling for API responses.
-- **`src/ai/flows/organize-playlist-metadata.ts`**: A Genkit flow that takes raw playlist metadata and uses an AI model to return a well-structured and readable version.
+- **`src/lib/spotify.ts`**: (Coming Soon) A collection of server-side functions that act as a client for the Spotify Web API. It will include functions for fetching user profiles, playlists, and top artists, with built-in error handling for API responses.
+- **`src/ai/flows/...`**: (Coming Soon) Genkit flows that take raw playlist metadata and use an AI model to return a well-structured and readable version.
 
 ## Project Dependencies
 
@@ -105,12 +90,11 @@ Here is a list of the primary dependencies used in this project:
 | `react`               | `18.2.0`   | A JavaScript library for building user interfaces.          |
 | `typescript`          | `^5`       | A typed superset of JavaScript that compiles to plain JS.   |
 | `tailwindcss`         | `^3.4.1`   | A utility-first CSS framework for rapid UI development.     |
-| `@shadcn/ui`          | various    | A collection of beautifully designed, reusable components.  |
-| `genkit`              | `^1.13.0`  | Google's framework for building AI-powered features.        |
-| `@genkit-ai/googleai` | `^1.13.0`  | Google AI plugin for Genkit.                                |
-| `lucide-react`        | `^0.475.0` | A library of simply beautiful open-source icons.            |
-| `jszip`               | `^3.10.1`  | A library for creating, reading, and editing .zip files.    |
-| `zod`                 | `^3.24.2`  | A TypeScript-first schema declaration and validation library. |
+| `@radix-ui/react-slot`| `^1.1.0`   | A primitive component for composing component slots.        |
+| `class-variance-authority` | `^0.7.0` | A library for creating variant-driven UI components.      |
+| `clsx`                | `^2.1.1`   | A tiny utility for constructing `className` strings conditionally.|
+| `lucide-react`        | `^0.411.0` | A library of simply beautiful open-source icons.            |
+| `tailwind-merge`      | `^2.4.0`   | A utility for merging Tailwind CSS classes.                 |
 
 ## Environment Variables
 
@@ -140,7 +124,6 @@ NEXT_PUBLIC_APP_URL="http://127.0.0.1:9002"
 
 - [Node.js](https://nodejs.org/) (v18 or later recommended)
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- [Docker](https://www.docker.com/products/docker-desktop/) (for Docker setup)
 
 ### Manual Setup
 
@@ -166,19 +149,6 @@ NEXT_PUBLIC_APP_URL="http://127.0.0.1:9002"
     ```
     The application will be available at `http://127.0.0.1:9002`.
 
-### Docker Setup
-
-This is the recommended way to run the application locally, as it ensures a consistent environment.
-
-1.  **Set up environment variables:**
-    - Create a `.env` file as described in the "Manual Setup" section.
-
-2.  **Build and run the container:**
-    ```bash
-    docker-compose up --build
-    ```
-    The application will be available at `http://127.0.0.1:9002`. The container uses `Dockerfile.dev` and mounts the `src` directory, so changes to your code will trigger hot-reloading.
-
 ## Building for Production
 
 To create a production-ready build of the application, run the following command:
@@ -191,54 +161,13 @@ This will create an optimized build in the `.next` directory. You can then start
 
 ## Deployment
 
-### Using Docker
-
-The `Dockerfile.prod` is optimized for production. It creates a small, efficient image by using a multi-stage build process.
-
-1.  **Build the production Docker image:**
-    ```bash
-    docker build -f Dockerfile.prod -t spotback-prod .
-    ```
-
-2.  **Run the container:**
-    - Remember to pass your environment variables to the container. You can do this with an `.env` file or directly on the command line.
-    ```bash
-    docker run -p 9002:9002 --env-file .env spotback-prod
-    ```
-    Your application will be running on port 9002.
-
-### Firebase App Hosting
-
-This project is configured to be easily deployed to Firebase App Hosting.
-
-1.  **Install the Firebase CLI:**
-    ```bash
-    npm install -g firebase-tools
-    ```
-
-2.  **Login to Firebase:**
-    ```bash
-    firebase login
-    ```
-
-3.  **Initialize Firebase in your project:**
-    ```bash
-    firebase init apphosting
-    ```
-    Follow the prompts to connect to your Firebase project.
-
-4.  **Deploy:**
-    ```bash
-    firebase apphosting:backends:deploy
-    ```
-    The Firebase CLI will build your application using the configuration in `apphosting.yaml` and deploy it. Remember to configure your environment variables in the Google Cloud Secret Manager as prompted during setup.
+This project is configured to be easily deployed to Firebase App Hosting or any platform that supports Node.js/Next.js applications.
 
 ## Troubleshooting
 
 - **Error: `INVALID_CLIENT: Invalid redirect URI`**: This is the most common error. Double-check that the `NEXT_PUBLIC_APP_URL` in your `.env` file exactly matches one of the Redirect URIs you've configured in the Spotify Developer Dashboard. The full URI must be `http://your-url/api/auth/callback/spotify`.
 - **401 Unauthorized / Session Expired**: Spotify access tokens expire after one hour. The application currently requires you to log out and log back in.
-- **Docker Build Fails**: Ensure Docker has enough resources (CPU/memory) allocated in its settings. Clear your Docker cache (`docker builder prune`) and try again.
-- **"Buy me a pizza" button not showing**: The widget is loaded in an `<iframe>`. Ensure your browser or any ad-blockers are not blocking content from `buymeacoffee.com`.
+- **Hydration Error**: If you see "Text content does not match server-rendered HTML", it's likely due to a mismatch between what the server rendered (no access to `localStorage`) and what the client rendered initially. The `HomePageContent` component uses a `isClient` state check to prevent this.
 
 ### Post-Mortem: A Note on the Extended Debugging of the Authentication Flow
 
