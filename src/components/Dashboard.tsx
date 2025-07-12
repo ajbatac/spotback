@@ -42,24 +42,27 @@ export function Dashboard() {
       setIsLoading(true);
       setError(null);
       
-      // First, fetch the user profile. This is for display only.
-      // If it fails, we log it but don't break the app.
       try {
+        // First, fetch the user profile. This is for display only.
+        // A failure here should not break the entire app.
         const userProfile = await getUserProfile(accessToken);
         setUser(userProfile);
       } catch (err: any) {
           console.error("Failed to fetch user profile:", err);
-          // We can set a non-critical error here if we want, but we won't log out.
+          // Non-critical error: Log it, but don't log out the user.
+          // The app can still function without the user's name in the header.
       }
       
       // Second, fetch playlists. This is critical data.
-      // If this fails, we show an error to the user.
+      // If this fails, we show an error to the user and suggest a re-login.
       try {
         const userPlaylists = await getPlaylists(accessToken);
         setPlaylists(userPlaylists);
       } catch (err: any) {
         console.error("Failed to fetch playlists:", err);
-        setError(err.message || 'Failed to fetch your playlists from Spotify. The API might be temporarily down, or your token may have expired.');
+        setError(err.message || 'Failed to fetch your playlists from Spotify. The API might be temporarily down, or your session may have expired.');
+        // Do NOT logout automatically, as that causes the redirect loop.
+        // Let the user decide to log out.
       } finally {
         setIsLoading(false);
       }
