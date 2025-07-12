@@ -5,7 +5,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
   const error = searchParams.get('error');
-  const state = search_params.get('state');
+  const state = searchParams.get('state');
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 

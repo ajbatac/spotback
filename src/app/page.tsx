@@ -19,8 +19,6 @@ function LoginPage() {
 
   useEffect(() => {
     async function setupAuthUrl() {
-      // This function now exclusively uses credentials from the session.
-      // If there are no credentials, the button will direct the user to the credentials page.
       if (!credentials) {
           setIsReady(true);
           return;
@@ -30,11 +28,10 @@ function LoginPage() {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
         if (!appUrl) {
-          throw new Error("Application URL is not configured. Please contact the administrator.");
+          throw new Error("Application URL is not configured. The NEXT_PUBLIC_APP_URL environment variable is missing.");
         }
 
         if (!clientId || !clientSecret) {
-          // This case should ideally not be hit if UI logic is correct, but it's a good safeguard.
           throw new Error("Missing required Spotify keys. Please enter your credentials.");
         }
 
@@ -54,9 +51,8 @@ function LoginPage() {
         authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
         authUrl.searchParams.append('show_dialog', 'true');
         
-        // Pass credentials to the backend via the 'state' parameter
         const state = JSON.stringify({ clientId, clientSecret });
-        authUrl.searchParams.append('state', btoa(state)); // Base64 encode the state
+        authUrl.searchParams.append('state', btoa(state));
 
         setSpotifyAuthUrl(authUrl.toString());
       } catch (e: any) {
@@ -136,24 +132,20 @@ function HomePageContent() {
   const { accessToken, setToken } = useAuth();
   const searchParams = useSearchParams();
   const tokenFromUrl = searchParams.get('access_token');
-  const errorFromUrl = searchParams.get('error');
+  const errorFromUrl = search_params.get('error');
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This effect runs only on the client, after the initial render.
-    // This safely gates the rendering of components that depend on client-side state.
     setIsClient(true);
   }, []);
   
   useEffect(() => {
     if (tokenFromUrl) {
       setToken(tokenFromUrl);
-      // Clean the URL
       window.history.replaceState({}, document.title, "/");
     } else if (errorFromUrl) {
       setError(errorFromUrl);
-       // Clean the URL
       window.history.replaceState({}, document.title, "/");
     }
   }, [tokenFromUrl, errorFromUrl, setToken]);
@@ -172,7 +164,6 @@ function HomePageContent() {
   }
   
   if (!isClient) {
-    // Render nothing on the server and initial client render to avoid hydration mismatch
     return null;
   }
   
