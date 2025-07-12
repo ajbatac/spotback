@@ -76,15 +76,13 @@ export function Dashboard() {
         const errorMessage = err.message || 'Failed to fetch your data from Spotify. The API might be temporarily down, or your session may have expired.';
         setError(errorMessage);
         setDebugInfo(prev => ({...prev!, output: `ERROR: ${errorMessage}`}));
-        // NO LONGER LOGGING OUT AUTOMATICALLY.
-        // logout(); 
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [accessToken, setUser, user]);
+  }, [accessToken]);
 
   const handleSelectAll = (checked: boolean | 'indeterminate') => {
     if (checked === true) {
