@@ -1,10 +1,11 @@
+
 'use client';
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
-import { Music } from 'lucide-react';
+import { Music, LogIn } from 'lucide-react';
 import { Dashboard } from '@/components/Dashboard';
 import { Footer } from '@/components/Footer';
 
@@ -70,6 +71,7 @@ function LoginPage() {
           ) : spotifyAuthUrl ? (
             <Button size="lg" asChild className="shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
               <a href={spotifyAuthUrl}>
+                <LogIn className="mr-2 h-5 w-5" />
                 Login with Spotify
               </a>
             </Button>
