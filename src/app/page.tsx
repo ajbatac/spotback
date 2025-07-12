@@ -51,8 +51,9 @@ function LoginPage() {
         authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
         authUrl.searchParams.append('show_dialog', 'true');
         
-        const state = JSON.stringify({ clientId, clientSecret });
-        authUrl.searchParams.append('state', btoa(state));
+        // Encode the credentials in base64 to pass them through the state parameter
+        const state = btoa(JSON.stringify({ clientId, clientSecret }));
+        authUrl.searchParams.append('state', state);
 
         setSpotifyAuthUrl(authUrl.toString());
       } catch (e: any) {
