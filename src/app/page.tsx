@@ -17,23 +17,19 @@ function HomePageContent() {
       try {
         const response = await fetch('/api/config');
         
-        // Check if the response is not OK (e.g., 500 error)
         if (!response.ok) {
-          // Try to get a specific error message from the JSON body
           const config = await response.json().catch(() => ({ error: 'Failed to parse error response from server.' }));
           throw new Error(config.error || `Server responded with status: ${response.status}`);
         }
         
         const config = await response.json();
         
-        // This check is redundant if the above handles non-ok, but good for safety
         if (config.error) {
             throw new Error(config.error);
         }
 
         const { appUrl, clientId } = config;
 
-        // This check is also mostly for safety, the API route should have validated this
         if (!appUrl || !clientId) {
             throw new Error('Required configuration (URL or Client ID) is missing from server response.');
         }
@@ -57,7 +53,6 @@ function HomePageContent() {
         setSpotifyAuthUrl(authUrl.toString());
 
       } catch (e: any) {
-        // Set the final error message to be displayed
         setConfigError(e.message || 'An unknown error occurred while fetching config.');
       }
     }
@@ -102,9 +97,7 @@ function HomePageContent() {
   return (
     <div>
       <h1>Spotify Barebones Login</h1>
-
       <hr />
-
       <h2>1. The Call We Will Make</h2>
       <p>
         When you click the link below, you will be sent to this URL to ask for your permission:
@@ -115,9 +108,7 @@ function HomePageContent() {
       <pre>
         <code>{spotifyAuthUrl || 'Loading...'}</code>
       </pre>
-
       <hr />
-
       <h2>2. The Return Callback URL</h2>
       <p>After you approve, Spotify will redirect you back to our server at this specific URL:</p>
       <p>
@@ -127,9 +118,7 @@ function HomePageContent() {
         <code>{redirectUri || 'Loading...'}</code>
       </pre>
       <p><em>(You must add this exact URL to your allowed Redirect URIs in the Spotify Developer Dashboard)</em></p>
-
       <hr />
-
       <h2>3. Initiate Login</h2>
       {spotifyAuthUrl ? (
         <p>
