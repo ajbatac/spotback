@@ -182,7 +182,7 @@ export function Dashboard() {
              <p className="text-muted-foreground mt-1">{selectedPlaylists.size} of {playlists.length} selected</p>
           </div>
           {selectedPlaylists.size > 0 && !backupComplete && (
-            <Button onClick={handleBackup} disabled={isBackingUp} size="lg" className="shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+            <Button onClick={handleBackup} disabled={isBackingUp} size="lg">
               {isBackingUp ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -228,10 +228,9 @@ export function Dashboard() {
              </div>
              <div className="mt-6">
                 <Button 
-                    variant="success" 
+                    variant="default" 
                     size="lg"
-                    onClick={() => { setBackupComplete(false); setSelectedPlaylists(new Set()); }} 
-                    className="shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+                    onClick={() => { setBackupComplete(false); setSelectedPlaylists(new Set()); }}
                 >
                     <PlusCircle className="mr-2 h-5 w-5" />
                     Start a New Backup

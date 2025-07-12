@@ -69,14 +69,14 @@ function LoginPage() {
               <p>{configError}</p>
             </div>
           ) : spotifyAuthUrl ? (
-            <Button size="lg" asChild className="shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+            <Button size="lg" asChild>
               <a href={spotifyAuthUrl}>
                 <LogIn className="mr-2 h-5 w-5" />
                 Login with Spotify
               </a>
             </Button>
           ) : (
-            <Button size="lg" disabled className="shadow-lg">
+            <Button size="lg" disabled>
               Loading...
             </Button>
           )}
