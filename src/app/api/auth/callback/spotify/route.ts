@@ -32,7 +32,12 @@ export async function GET(req: NextRequest) {
 
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-  const redirectUri = `${appUrl}/api/auth/callback/spotify`;
+  
+  // Dynamically construct the redirect URI from the request headers
+  // to ensure it matches what Spotify expects, even behind a proxy.
+  const host = req.headers.get('host');
+  const proto = req.headers.get('x-forwarded-proto') || 'http';
+  const redirectUri = `${proto}://${host}/api/auth/callback/spotify`;
 
   if (!clientId || !clientSecret) {
     const error_msg = "Server misconfiguration: Spotify credentials not set. Check server environment variables.";
@@ -50,7 +55,7 @@ export async function GET(req: NextRequest) {
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/x--form-urlencoded',
         'Authorization': 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64'),
       },
       body: requestBody,
