@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added "Why SpotBack?" section to the login page for new users.
+- Replaced login page icon with a custom PNG image (`public/spotify.png`).
+- Programmatically generate app favicon via `src/app/icon.tsx` to resolve browser and build conflicts.
+
+### Changed
+- Updated login page description to be more energetic and engaging.
+- Restored hover animation to all primary action buttons for better user feedback.
+- Made the changelog link in the footer open in a new tab.
+
+### Fixed
+- Corrected page layout to ensure footer sits directly below content, not at the bottom of the viewport.
+- Adjusted login page alignment to position content higher on the screen.
+- Resolved favicon conflict error by removing the static file from `/public` and using the Next.js App Router's `icon.tsx` convention.
+
 ## [0.2.0] - 2024-07-12
 
 ### Added
@@ -15,10 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Improved UI consistency for all primary action buttons.
 - Increased size of the footer QR code for better visibility and usability.
-
-### Fixed
-- Corrected page layout to ensure footer sits directly below content, not at the bottom of the viewport.
-- Adjusted login page alignment to position content higher on the screen.
 
 ## [0.1.0] - 2024-07-11
 

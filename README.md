@@ -42,6 +42,7 @@ The project follows a standard Next.js App Router structure, with logical separa
 ```
 .
 ├── public/
+│   ├── spotify.png
 │   └── changelog.html
 ├── src/
 │   ├── app/
@@ -49,6 +50,7 @@ The project follows a standard Next.js App Router structure, with logical separa
 │   │   │   ├── auth/callback/spotify/route.ts
 │   │   │   └── config/route.ts
 │   │   ├── globals.css
+│   │   ├── icon.tsx
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── components/
@@ -102,6 +104,8 @@ Here is a list of the primary dependencies used in this project:
 | `js-file-download`    | `^0.4.12`  | A utility for triggering file downloads in the browser.     |
 | `lucide-react`        | `^0.411.0` | A library of simply beautiful open-source icons.            |
 | `@types/spotify-api`  | `^0.0.25`  | TypeScript definitions for the Spotify Web API.             |
+| `clsx`                | `^2.1.1`   | A tiny utility for constructing `className` strings.        |
+| `tailwind-merge`      | `^2.4.0`   | A utility to intelligently merge Tailwind CSS classes.      |
 
 ## Environment Variables
 
@@ -143,3 +147,4 @@ npm run build
 
 - **Error: `INVALID_CLIENT: Invalid redirect URI`**: This is the most common error. Double-check that the `NEXT_PUBLIC_APP_URL` in your `.env` file exactly matches one of the Redirect URIs you've configured in the Spotify Developer Dashboard. The full URI must be `http://your-url/api/auth/callback/spotify`.
 - **401 Unauthorized / Session Expired**: Spotify access tokens expire after one hour. The application currently requires you to log out and log back in to get a new one.
+- **Favicon Errors**: The application uses `src/app/icon.tsx` to generate the favicon, which is the recommended method for the Next.js App Router. If you see conflicts, ensure you do not have a `favicon.ico` file in the `public/` directory.

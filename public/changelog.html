@@ -5,88 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpotBack Changelog</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        h1, h2, h3 {
-            color: #1DB954; /* Spotify Green */
-        }
-        h1 {
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-        h2 {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-        code {
-            background-color: #eee;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
-        a {
-            color: #1DB954;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        ul {
-            padding-left: 20px;
-        }
-        li {
-            margin-bottom: 10px;
-        }
-        .version-section {
-            margin-bottom: 40px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2, h3 { color: #1DB954; }
+        h1 { text-align: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; margin-top: 40px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+        code { background-color: #f6f8fa; padding: .2em .4em; margin: 0; font-size: 85%; border-radius: 3px; }
+        .version-tag { font-size: 0.8em; color: #666; }
+        .change-type { font-weight: bold; color: #111; }
     </style>
 </head>
 <body>
     <h1>SpotBack Changelog</h1>
-    <p>All notable changes to this project will be documented in this file.</p>
-    <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+    <p>All notable changes to this project are documented in this file.</p>
+    
+    <h2>[Unreleased]</h2>
+    <ul>
+        <li><span class="change-type">Added:</span> Added "Why SpotBack?" section to the login page for new users.</li>
+        <li><span class="change-type">Added:</span> Replaced login page icon with a custom PNG image (<code>public/spotify.png</code>).</li>
+        <li><span class="change-type">Added:</span> Programmatically generate app favicon via <code>src/app/icon.tsx</code> to resolve browser and build conflicts.</li>
+        <li><span class="change-type">Changed:</span> Updated login page description to be more energetic and engaging.</li>
+        <li><span class="change-type">Changed:</span> Restored hover animation to all primary action buttons for better user feedback.</li>
+        <li><span class="change-type">Changed:</span> Made the changelog link in the footer open in a new tab.</li>
+        <li><span class="change-type">Fixed:</span> Corrected page layout to ensure footer sits directly below content, not at the bottom of the viewport.</li>
+        <li><span class="change-type">Fixed:</span> Adjusted login page alignment to position content higher on the screen.</li>
+        <li><span class="change-type">Fixed:</span> Resolved favicon conflict error by removing the static file from <code>/public</code> and using the Next.js App Router's <code>icon.tsx</code> convention.</li>
+    </ul>
 
-    <div class="version-section">
-        <h2>[0.2.0] - 2024-07-12</h2>
-        <h3>Added</h3>
-        <ul>
-            <li>QR code in the footer is now a clickable link to support the creator.</li>
-        </ul>
-        <h3>Changed</h3>
-        <ul>
-            <li>Improved UI consistency for all primary action buttons.</li>
-            <li>Increased size of the footer QR code for better visibility and usability.</li>
-        </ul>
-        <h3>Fixed</h3>
-        <ul>
-            <li>Corrected page layout to ensure footer sits directly below content, not at the bottom of the viewport.</li>
-            <li>Adjusted login page alignment to position content higher on the screen.</li>
-        </ul>
-    </div>
+    <h2>[0.2.0] - <span class="version-tag">2024-07-12</span></h2>
+    <ul>
+        <li><span class="change-type">Added:</span> QR code in the footer is now a clickable link to support the creator.</li>
+        <li><span class="change-type">Changed:</span> Improved UI consistency for all primary action buttons.</li>
+        <li><span class="change-type">Changed:</span> Increased size of the footer QR code for better visibility and usability.</li>
+    </ul>
 
-    <div class="version-section">
-        <h2>[0.1.0] - 2024-07-11</h2>
-        <h3>Added</h3>
-        <ul>
-            <li><strong>Initial Release</strong> of SpotBack!</li>
-            <li>Secure Spotify OAuth 2.0 authentication.</li>
-            <li>Fetches and displays user profile and all user playlists.</li>
-            <li>Select one, multiple, or all playlists for backup.</li>
-            <li>User-friendly dashboard to manage playlists and backups.</li>
-            <li>Export selected playlists to JSON, XML, or a TXT file of URLs.</li>
-            <li>Responsive landing page and dashboard.</li>
-            <li>Header with user info and footer with project credits.</li>
-            <li>Consistent UI theme with styled buttons, icons, and hover animations.</li>
-            <li>Comprehensive <code>README.md</code> documentation and a public changelog.</li>
-        </ul>
-    </div>
+    <h2>[0.1.0] - <span class="version-tag">2024-07-11</span></h2>
+    <ul>
+        <li><span class="change-type">Added:</span> <strong>Initial Release</strong> of SpotBack!</li>
+        <li><span class="change-type">Added:</span> Secure Spotify OAuth 2.0 authentication.</li>
+        <li><span class="change-type">Added:</span> Fetches and displays user profile and all user playlists.</li>
+        <li><span class="change-type">Added:</span> Select one, multiple, or all playlists for backup.</li>
+        <li><span class="change-type">Added:</span> User-friendly dashboard to manage playlists and backups.</li>
+        <li><span class="change-type">Added:</span> Export selected playlists to JSON, XML, or a TXT file of URLs.</li>
+        <li><span class="change-type">Added:</span> Responsive landing page and dashboard.</li>
+        <li><span class="change-type">Added:</span> Header with user info and footer with project credits.</li>
+        <li><span class="change-type">Added:</span> Consistent UI theme with styled buttons, icons, and hover animations.</li>
+        <li><span class="change-type">Added:</span> Comprehensive <code>README.md</code> documentation and a public changelog.</li>
+    </ul>
 
 </body>
 </html>
