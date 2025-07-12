@@ -50,6 +50,7 @@ export default function CredentialsPage() {
               alt="SpotBack Logo"
               width={64}
               height={64}
+              quality={100}
               data-ai-hint="logo"
             />
           </Link>

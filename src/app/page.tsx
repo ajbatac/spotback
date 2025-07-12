@@ -77,6 +77,7 @@ function LoginPage() {
             alt="SpotBack Logo"
             width={64}
             height={64}
+            quality={100}
             data-ai-hint="logo"
           />
           <h1 className="text-5xl font-bold tracking-tight text-gray-800">
