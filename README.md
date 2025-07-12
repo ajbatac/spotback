@@ -8,11 +8,14 @@ SpotBack is a web application built with Next.js that allows users to securely c
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Key Components & Functionality](#key-components--functionality)
-- [Can I Restore My Backup to Another Account?](#can-i-restore-my-backup-to-another-account)
-- [Project Dependencies](#project-dependencies)
 - [Environment Variables](#environment-variables)
 - [Getting Started (Local Development)](#getting-started-local-development)
-- [Building for Production](#building-for-production)
+  - [Prerequisites](#prerequisites)
+  - [Standard Setup](#standard-setup)
+  - [Docker Setup](#docker-setup)
+- [Deployment](#deployment)
+  - [Build](#build)
+  - [Firebase App Hosting](#firebase-app-hosting)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -25,15 +28,14 @@ SpotBack is a web application built with Next.js that allows users to securely c
 - **Multiple Export Formats**: Export playlists in their official JSON format, as XML, or as a simple TXT file of playlist URLs.
 - **Responsive Design**: Fully functional on both desktop and mobile devices.
 - **Consistent UI**: Uniform styling and icons for all primary buttons and actions.
-- **AI-Powered Metadata Organization**: (Coming Soon) Utilizes Genkit to process and enhance playlist metadata for better readability.
 
 ## Tech Stack
 
 - **Framework**: [Next.js](https://nextjs.org/) (v14) with App Router
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/) for pre-built components.
-- **AI Integration**: [Genkit](https://firebase.google.com/docs/genkit) for generative AI flows.
 - **Authentication**: OAuth 2.0 with the Spotify Web API.
+- **Containerization**: [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
 
 ## Project Structure
 
@@ -41,35 +43,39 @@ The project follows a standard Next.js App Router structure, with logical separa
 
 ```
 .
-├── public/
-│   ├── spotify.png
-│   └── changelog.html
+├── public/                     # Static assets (images, html files)
+│   ├── bmc_qr.png
+│   └── spotify.png
 ├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── auth/callback/spotify/route.ts
-│   │   │   └── config/route.ts
-│   │   ├── globals.css
-│   │   ├── icon.tsx
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   ├── components/
-│   │   ├── Dashboard.tsx
-│   │   ├── Footer.tsx
-│   │   ├── Header.tsx
-│   │   ├── PlaylistCard.tsx
-│   │   └── ui/
+│   ├── app/                    # Next.js App Router directory
+│   │   ├── api/                # API routes
+│   │   │   ├── auth/callback/spotify/route.ts  # Handles Spotify OAuth callback
+│   │   │   └── config/route.ts # Serves public env vars to the client
+│   │   ├── globals.css         # Global styles and Tailwind directives
+│   │   ├── icon.tsx            # Programmatically generated favicon
+│   │   ├── layout.tsx          # Root application layout
+│   │   └── page.tsx            # Main entry point (Login/Dashboard)
+│   ├── components/             # Reusable React components
+│   │   ├── ui/                 # Core UI components from shadcn/ui
+│   │   ├── Dashboard.tsx       # Main authenticated user interface
+│   │   ├── Footer.tsx          # Application footer
+│   │   ├── Header.tsx          # Application header
+│   │   └── PlaylistCard.tsx    # Card for displaying a single playlist
 │   ├── context/
-│   │   └── auth-context.tsx
+│   │   └── auth-context.tsx    # Manages global auth state (token, user)
 │   ├── hooks/
-│   │   └── use-local-storage.ts
-│   ├── lib/
-│   │   ├── spotify.ts
-│   │   └── utils.ts
-├── .env
-├── next.config.js
-├── package.json
-└── README.md
+│   │   └── use-local-storage.ts# Hook for persisting state to localStorage
+│   └── lib/
+│       ├── spotify.ts          # Client for interacting with the Spotify API
+│       └── utils.ts            # Utility functions (cn, jsonToXml)
+├── .env                        # Environment variable declarations (gitignored)
+├── apphosting.yaml             # Firebase App Hosting configuration
+├── Dockerfile.dev              # Dockerfile for development environment
+├── Dockerfile.prod             # Dockerfile for production builds
+├── docker-compose.yml          # Docker Compose for local development
+├── next.config.js              # Next.js configuration
+├── package.json                # Project dependencies and scripts
+└── README.md                   # This file
 ```
 
 ## Key Components & Functionality
@@ -78,38 +84,11 @@ The project follows a standard Next.js App Router structure, with logical separa
 - **`src/context/auth-context.tsx`**: A React Context that manages the global authentication state, holding the Spotify access token and user profile information. It uses the `use-local-storage` hook to persist state, keeping the user logged in across browser sessions.
 - **`src/lib/spotify.ts`**: A client for the Spotify Web API. It includes functions for fetching the user's profile and all of their playlists (handling pagination automatically).
 - **`src/components/Dashboard.tsx`**: The main application interface for authenticated users. It fetches data, manages the state for playlist selection, and handles the multi-step backup and download process.
-- **`src/components/Header.tsx`**: A responsive header that displays the application logo, the logged-in user's name and profile picture, and a logout button.
-- **`src/components/PlaylistCard.tsx`**: A component that displays a single playlist's cover art, name, owner, and track count, along with an interactive checkbox for selection.
-- **`src/components/Footer.tsx`**: A site-wide footer containing a link to support the creator, copyright info, and a link to the project's changelog.
-
-
-## Can I Restore My Backup to Another Account?
-
-**No, not directly.** The Spotify API does not have a feature to "upload" a backup file to restore playlists.
-
-However, the exported `.json` file contains all the necessary information (the playlist name, description, and a list of every track's unique Spotify URI) to rebuild your playlists. A future version of SpotBack could include a "Restore" feature that would read this file and programmatically create the playlists and add the songs to a different account. For now, the backup serves as a secure, personal record of your musical library.
-
-## Project Dependencies
-
-Here is a list of the primary dependencies used in this project:
-
-| Package               | Version    | Description                                                 |
-| --------------------- | ---------- | ----------------------------------------------------------- |
-| `next`                | `14.2.0`   | The React framework for building the application.           |
-| `react`               | `18.2.0`   | A JavaScript library for building user interfaces.          |
-| `typescript`          | `^5`       | A typed superset of JavaScript that compiles to plain JS.   |
-| `tailwindcss`         | `^3.4.1`   | A utility-first CSS framework for rapid UI development.     |
-| `@radix-ui/react-checkbox` | `^1.1.1` | A primitive component for creating accessible checkboxes. |
-| `@radix-ui/react-label`| `^2.1.0`   | An accessible label component for form inputs.              |
-| `js-file-download`    | `^0.4.12`  | A utility for triggering file downloads in the browser.     |
-| `lucide-react`        | `^0.411.0` | A library of simply beautiful open-source icons.            |
-| `@types/spotify-api`  | `^0.0.25`  | TypeScript definitions for the Spotify Web API.             |
-| `clsx`                | `^2.1.1`   | A tiny utility for constructing `className` strings.        |
-| `tailwind-merge`      | `^2.4.0`   | A utility to intelligently merge Tailwind CSS classes.      |
+- **`src/app/api/auth/callback/spotify/route.ts`**: The server-side route that finalizes the OAuth 2.0 flow. It receives the authorization code from Spotify, exchanges it for an access token, and redirects the user back to the main application with the token.
 
 ## Environment Variables
 
-To run this project, you **must** create a `.env` file in the root of the project and add the following environment variables. You can get Spotify credentials by creating an app on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
+To run this project, you **must** create a `.env` file in the root of the project by copying `.env.example`. You can get Spotify credentials by creating an app on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
 
 ```bash
 # .env
@@ -119,7 +98,7 @@ NEXT_PUBLIC_SPOTIFY_CLIENT_ID="YOUR_SPOTIFY_CLIENT_ID"
 SPOTIFY_CLIENT_SECRET="YOUR_SPOTIFY_CLIENT_SECRET"
 
 # The public URL of your application.
-# For local development, this is typically http://127.0.0.1:9002
+# For local development, this is typically http://localhost:9002
 # For production, it must be the public URL of your deployed app.
 # IMPORTANT: You must add this URL (including the /api/auth/callback/spotify part)
 # to the "Redirect URIs" in your Spotify Developer Dashboard settings.
@@ -128,14 +107,33 @@ NEXT_PUBLIC_APP_URL="https://spotback.website"
 
 ## Getting Started (Local Development)
 
+### Prerequisites
+- [Node.js](https://nodejs.org/en/) (v18 or later)
+- [npm](https://www.npmjs.com/)
+- [Docker](https://www.docker.com/products/docker-desktop/) (for Docker-based setup)
+
+### Standard Setup
+
 1.  **Clone the repository.**
 2.  **Install dependencies:** `npm install`
-3.  **Set up environment variables:** Create a `.env` file and populate it with your credentials as described above. **For local development, change `NEXT_PUBLIC_APP_URL` to `http://127.0.0.1:9002`**.
+3.  **Set up environment variables:** Create a `.env` file and populate it with your credentials as described above. **For local development, change `NEXT_PUBLIC_APP_URL` to `http://localhost:9002`**.
 4.  **Run the development server:** `npm run dev`
 
-The application will be available at `http://127.0.0.1:9002`.
+The application will be available at `http://localhost:9002`.
 
-## Building for Production
+### Docker Setup
+
+This method uses Docker Compose to build and run the application in a container.
+
+1.  **Clone the repository.**
+2.  **Set up environment variables:** Create a `.env` file as described above. Ensure `NEXT_PUBLIC_APP_URL` is set to `http://localhost:9002`.
+3.  **Build and run the container:** `docker-compose up --build`
+
+The application will be available at `http://localhost:9002`, with hot-reloading enabled.
+
+## Deployment
+
+### Build
 
 To create a production-ready build of the application, run the following command:
 
@@ -143,9 +141,24 @@ To create a production-ready build of the application, run the following command
 npm run build
 ```
 
+This will generate an optimized build in the `.next` directory.
+
+### Firebase App Hosting
+
+This project is configured for one-click deployment with Firebase App Hosting.
+
+1.  **Set up Firebase**: Ensure you have a Firebase project and the Firebase CLI installed (`npm install -g firebase-tools`).
+2.  **Configure Backend**: In the Firebase console, create a new App Hosting backend.
+3.  **Connect GitHub**: Connect your GitHub repository to the App Hosting backend.
+4.  **Set Secrets**: In the App Hosting settings, add the `SPOTIFY_CLIENT_SECRET` as a secret. The other environment variables are public and are managed via the `.env` file committed to the repository.
+5.  **Deploy**: Pushing to the main branch will automatically trigger a new build and deployment.
+
+The `apphosting.yaml` file configures the deployment settings for Firebase.
+
 ## Troubleshooting
 
-- **Error: `INVALID_CLIENT: Invalid redirect URI`**: This is the most common error. Double-check that the `NEXT_PUBLIC_APP_URL` in your `.env` file exactly matches one of the Redirect URIs you've configured in the Spotify Developer Dashboard. The full URI must be `http://your-url/api/auth/callback/spotify`.
+- **Error: `INVALID_CLIENT: Invalid redirect URI`**: This is the most common error. Double-check that the `NEXT_PUBLIC_APP_URL` in your `.env` file (or build environment) exactly matches one of the Redirect URIs you've configured in the Spotify Developer Dashboard. The full URI must be `http://your-url/api/auth/callback/spotify`.
 - **401 Unauthorized / Session Expired**: Spotify access tokens expire after one hour. The application currently requires you to log out and log back in to get a new one.
-- **Favicon Errors**: The application uses `src/app/icon.tsx` to generate the favicon, which is the recommended method for the Next.js App Router. If you see conflicts, ensure you do not have a `favicon.ico` file in the `public/` directory.
-
+- **Docker Build Fails**: Ensure Docker is running and that you have sufficient permissions to run Docker commands.
+- **Favicon Errors**: The application uses `src/app/icon.tsx` to generate the favicon, which is the recommended method for the Next.js App Router. If you see conflicts, ensure you do not have a `favicon.ico` file in the `public/` or `src/app/` directories.
+```
