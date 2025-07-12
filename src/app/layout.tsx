@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { PT_Sans } from 'next/font/google';
-import Script from 'next/script';
 import { AuthProvider } from '@/context/auth-context';
 import './globals.css';
 import { cn } from '@/lib/utils';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
+import { Suspense } from 'react';
 
 const ptSans = PT_Sans({
   subsets: ['latin'],
@@ -31,26 +32,14 @@ export default function RootLayout({
           ptSans.variable
         )}
       >
+        {gaMeasurementId && (
+            <Suspense>
+                <GoogleAnalytics ga_id={gaMeasurementId} />
+            </Suspense>
+        )}
         <AuthProvider>
           {children}
         </AuthProvider>
-
-        {gaMeasurementId && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${gaMeasurementId}');
-              `}
-            </Script>
-          </>
-        )}
       </body>
     </html>
   );
