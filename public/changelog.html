@@ -6,138 +6,145 @@
     <title>SpotBack Changelog</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             line-height: 1.6;
             color: #333;
+            background-color: #e0e0e0;
             max-width: 800px;
             margin: 0 auto;
             padding: 2rem;
-            background-color: #f9f9f9;
         }
         h1, h2, h3 {
-            color: #1DB954; /* Spotify Green */
-            border-bottom: 1px solid #eee;
-            padding-bottom: 0.5rem;
+            color: #2c2c2c;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 0.3em;
         }
         h1 {
-            text-align: center;
-            border-bottom: 2px solid #1DB954;
+            font-size: 2.5em;
+        }
+        h2 {
+            font-size: 2em;
+            margin-top: 2em;
+        }
+        h3 {
+            font-size: 1.5em;
+            margin-top: 1.5em;
+            border-bottom: none;
         }
         ul {
+            list-style-type: disc;
             padding-left: 20px;
         }
         li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.5em;
         }
         strong {
-            color: #191414; /* Spotify Black */
+            color: #1a1a1a;
         }
         code {
-            background-color: #eee;
-            padding: 2px 5px;
+            background-color: #f0f0f0;
+            padding: 2px 4px;
             border-radius: 4px;
-            font-family: "Courier New", Courier, monospace;
-        }
-        .version-section {
-            margin-bottom: 2rem;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
         }
         .version-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
         }
         .date {
-            color: #888;
-            font-size: 0.9rem;
+            color: #666;
+            font-size: 0.9em;
         }
         .tag {
-            background-color: #1DB954;
-            color: white;
-            padding: 0.2rem 0.5rem;
+            background-color: #a7d1ab;
+            color: #2405.9% 10%;
+            padding: 4px 8px;
             border-radius: 12px;
-            font-size: 0.8rem;
+            font-size: 0.8em;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
     <h1>SpotBack Changelog</h1>
+    <p>All notable changes to this project will be documented in this file.</p>
 
-    <div class="version-section">
-        <h2>Unreleased</h2>
-        <p>No new changes yet.</p>
+    <div class="version-header">
+        <h2>[0.3.0]</h2>
+        <span class="date">2025-07-12</span>
     </div>
+    <h3><span class="tag">Added</span></h3>
+    <ul>
+        <li><strong>Major Feature: "Bring Your Own Keys" (BYOK) Architecture.</strong> The application now requires users to provide their own Spotify API credentials, making it usable by anyone without needing a publicly approved Spotify app.</li>
+        <li><strong>New Credentials Page (<code>/credentials</code>):</strong> A dedicated page for users to securely enter their Spotify Client ID and Client Secret.</li>
+        <li>User-provided keys are stored securely in the browser's <code>sessionStorage</code> and are never saved on the server.</li>
+        <li>Includes comprehensive, step-by-step instructions for users on how to:
+            <ol>
+                <li>Navigate to the Spotify Developer Dashboard.</li>
+                <li>Create a new Spotify application.</li>
+                <li>Find their Client ID and Client Secret.</li>
+                <li>Correctly configure the required <code>Redirect URI</code>.</li>
+                <li>Add their own Spotify account email to the "Users and Access" list, which is required for apps in Development Mode.</li>
+            </ol>
+        </li>
+        <li><strong>Dynamic Redirect URI:</strong> The Redirect URI displayed in the instructions is now dynamically generated from the application's public URL, ensuring accuracy in both development and production environments.</li>
+        <li>Added "Why SpotBack?" section to the login page for new users.</li>
+        <li>Replaced login page icon with a custom PNG image (<code>public/spotify.png</code>).</li>
+        <li>Programmatically generate app favicon via <code>src/app/icon.tsx</code> to resolve browser and build conflicts.</li>
+    </ul>
+    <h3><span class="tag">Changed</span></h3>
+    <ul>
+        <li><strong>Updated Authentication Flow:</strong> The primary user journey now starts with entering API keys. The main login page directs all users to the new credentials page.</li>
+        <li><strong>Stateless Authentication Callback:</strong> The server-side API endpoint (<code>/api/auth/callback/spotify</code>) has been re-architected to be completely stateless. It no longer depends on server-side environment variables for Spotify credentials.</li>
+        <li><strong>Simplified Environment:</strong> Removed the server-side <code>NEXT_PUBLIC_SPOTIFY_CLIENT_ID</code> and <code>SPOTIFY_CLIENT_SECRET</code> environment variables, as they are no longer used.</li>
+        <li>Updated login page description to be more energetic and engaging.</li>
+        <li>Restored hover animation to all primary action buttons for better user feedback.</li>
+        <li>Made the changelog link in the footer open in a new tab.</li>
+    </ul>
+    <h3><span class="tag">Fixed</span></h3>
+    <ul>
+        <li><strong>Critical Login Bug:</strong> Resolved an issue where the server-side callback would crash due to using a browser-only function (<code>atob</code>), which caused a "dangerous website" warning. Replaced with the correct Node.js <code>Buffer</code> method for robust server-side decoding.</li>
+        <li><strong>Redirect URI Mismatch:</strong> Fixed a persistent OAuth error by ensuring the <code>redirect_uri</code> used in the Spotify authorization link is dynamically and correctly constructed from the <code>NEXT_PUBLIC_APP_URL</code> environment variable. This ensures URL consistency between development and production environments.</li>
+        <li><strong>Invalid URL Bug:</strong> Corrected a string concatenation error that was producing a double slash (<code>//</code>) in the generated <code>redirect_uri</code>, which made the URL invalid.</li>
+        <li><strong>ReferenceError Fix:</strong> Fixed a typo (<code>search_params</code> instead of <code>searchParams</code>) on the main page that caused a runtime error when handling the callback from Spotify.</li>
+        <li>Corrected page layout to ensure footer sits directly below content, not at the bottom of the viewport.</li>
+        <li>Adjusted login page alignment to position content higher on the screen.</li>
+        <li>Resolved favicon conflict error by removing the static file from <code>/public</code> and using the Next.js App Router's <code>icon.tsx</code> convention.</li>
+        <li><strong>Troubleshooting Documentation:</strong> Updated <code>README.md</code> to include information about Spotify's "Development Mode" and the necessity of adding approved users, which is the cause of <code>403 Forbidden</code> errors.</li>
+    </ul>
 
-    <div class="version-section">
-      <div class="version-header">
-          <h2>Version 0.3.0</h2>
-          <span class="date">July 15, 2024</span>
-      </div>
-      <h3><span class="tag">Added</span></h3>
-      <ul>
-          <li><strong>Major Feature: "Bring Your Own Keys" (BYOK) Architecture.</strong> The application now requires users to provide their own Spotify API credentials.</li>
-          <li><strong>New Credentials Page (`/credentials`):</strong> A dedicated page for users to securely enter their Spotify Client ID and Client Secret.</li>
-          <li><strong>Dynamic Redirect URI:</strong> The Redirect URI displayed in the instructions is now dynamically generated from the application's public URL.</li>
-          <li>Added "Why SpotBack?" section to the login page for new users.</li>
-          <li>Replaced login page icon with a custom PNG image (`public/spotify.png`).</li>
-          <li>Programmatically generate app favicon via `src/app/icon.tsx`.</li>
-      </ul>
-      <h3><span class="tag">Changed</span></h3>
-      <ul>
-          <li><strong>Updated Authentication Flow:</strong> The primary user journey now starts with entering API keys.</li>
-          <li><strong>Stateless Authentication Callback:</strong> The server-side API endpoint (`/api/auth/callback/spotify`) has been re-architected to be completely stateless.</li>
-          <li><strong>Simplified Environment:</strong> Removed the server-side `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` environment variables.</li>
-          <li>Updated login page description to be more energetic and engaging.</li>
-          <li>Restored hover animation to all primary action buttons.</li>
-          <li>Made the changelog link in the footer open in a new tab.</li>
-      </ul>
-      <h3><span class="tag">Fixed</span></h3>
-      <ul>
-          <li><strong>Critical Login Bug:</strong> Resolved an issue where the server-side callback would crash due to using a browser-only function (`atob`).</li>
-          <li><strong>Redirect URI Mismatch:</strong> Fixed a persistent OAuth error by ensuring the `redirect_uri` used in the Spotify authorization link is dynamically and correctly constructed.</li>
-          <li><strong>Invalid URL Bug:</strong> Corrected a string concatenation error that was producing a double slash (`//`) in the generated `redirect_uri`.</li>
-          <li><strong>ReferenceError Fix:</strong> Fixed a typo (`search_params` instead of `searchParams`) on the main page.</li>
-          <li>Corrected page layout to ensure footer sits directly below content.</li>
-          <li>Adjusted login page alignment to position content higher on the screen.</li>
-          <li>Resolved favicon conflict error by removing the static file and using Next.js `icon.tsx`.</li>
-          <li><strong>Troubleshooting Documentation:</strong> Updated `README.md` to include information about Spotify's "Development Mode".</li>
-      </ul>
+    <div class="version-header">
+        <h2>[0.2.0]</h2>
+        <span class="date">2024-07-12</span>
     </div>
+    <h3><span class="tag">Added</span></h3>
+    <ul>
+        <li>QR code in the footer is now a clickable link to support the creator.</li>
+    </ul>
+    <h3><span class="tag">Changed</span></h3>
+    <ul>
+        <li>Improved UI consistency for all primary action buttons.</li>
+        <li>Increased size of the footer QR code for better visibility and usability.</li>
+    </ul>
     
-    <div class="version-section">
-        <div class="version-header">
-            <h2>Version 0.2.0</h2>
-            <span class="date">July 12, 2024</span>
-        </div>
-        <h3><span class="tag">Added</span></h3>
-        <ul>
-            <li>QR code in the footer is now a clickable link to support the creator.</li>
-        </ul>
-        <h3><span class="tag">Changed</span></h3>
-        <ul>
-            <li>Improved UI consistency for all primary action buttons.</li>
-            <li>Increased size of the footer QR code for better visibility and usability.</li>
-        </ul>
+    <div class="version-header">
+        <h2>[0.1.0]</h2>
+        <span class="date">2024-07-11</span>
     </div>
+    <h3><span class="tag">Added</span></h3>
+    <ul>
+        <li><strong>Initial Release</strong> of SpotBack!</li>
+        <li>Secure Spotify OAuth 2.0 authentication.</li>
+        <li>Fetches and displays user profile and all user playlists.</li>
+        <li>Select one, multiple, or all playlists for backup.</li>
+        <li>User-friendly dashboard to manage playlists and backups.</li>
+        <li>Export selected playlists to JSON, XML, or a TXT file of URLs.</li>
+        <li>Responsive landing page and dashboard.</li>
+        <li>Header with user info and footer with project credits.</li>
+        <li>Consistent UI theme with styled buttons, icons, and hover animations.</li>
+        <li>Comprehensive <code>README.md</code> documentation and a public changelog.</li>
+    </ul>
 
-    <div class="version-section">
-        <div class="version-header">
-            <h2>Version 0.1.0</h2>
-            <span class="date">July 11, 2024</span>
-        </div>
-        <h3><span class="tag">Added</span></h3>
-        <ul>
-            <li><strong>Initial Release</strong> of SpotBack!</li>
-            <li>Secure Spotify OAuth 2.0 authentication.</li>
-            <li>Fetches and displays user profile and all user playlists.</li>
-            <li>Select one, multiple, or all playlists for backup.</li>
-            <li>User-friendly dashboard to manage playlists and backups.</li>
-            <li>Export selected playlists to JSON, XML, or a TXT file of URLs.</li>
-            <li>Responsive landing page and dashboard.</li>
-            <li>Header with user info and footer with project credits.</li>
-            <li>Consistent UI theme with styled buttons, icons, and hover animations.</li>
-            <li>Comprehensive `README.md` documentation and a public changelog.</li>
-        </ul>
-    </div>
 </body>
 </html>
