@@ -5,7 +5,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
   const error = searchParams.get('error');
-  const state = searchParams.get('state');
+  const state = search_params.get('state');
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
@@ -28,10 +28,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(rootUrl);
   }
   
-  let clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-  let clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+  let clientId: string | undefined;
+  let clientSecret: string | undefined;
 
-  // If state contains credentials, use them instead of the server's default.
+  // Credentials must be passed from the client via the state parameter.
   if (state) {
     try {
       const decodedState = JSON.parse(atob(state));
@@ -40,15 +40,16 @@ export async function GET(req: NextRequest) {
         clientSecret = decodedState.clientSecret;
       }
     } catch (e) {
-      // Could be a normal state string, so we ignore the error
-      console.log("Could not parse state as JSON credentials, proceeding with default.");
+        const error_msg = "Could not parse credentials from state. Please try logging in again.";
+        rootUrl.searchParams.set('error', error_msg);
+        return NextResponse.redirect(rootUrl);
     }
   }
   
   const redirectUri = `${appUrl}/api/auth/callback/spotify`;
 
   if (!clientId || !clientSecret) {
-    const error_msg = "Server misconfiguration or missing keys: Spotify credentials not set. Please provide your own keys or check server environment variables.";
+    const error_msg = "Missing Spotify credentials. The application now requires you to provide your own API keys.";
     rootUrl.searchParams.set('error', error_msg);
     return NextResponse.redirect(rootUrl);
   }

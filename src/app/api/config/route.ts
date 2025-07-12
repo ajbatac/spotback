@@ -1,22 +1,18 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
+  // This endpoint is no longer needed for providing credentials,
+  // but can be kept for providing other public-facing configurations like the app URL.
+  // We remove the check for client ID as it's no longer sourced from the server's environment.
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
 
-  const missingVars = [];
-  if (!appUrl) missingVars.push('NEXT_PUBLIC_APP_URL');
-  if (!clientId) missingVars.push('NEXT_PUBLIC_SPOTIFY_CLIENT_ID');
-
-  if (missingVars.length > 0) {
-    const error = `Server configuration is missing required environment variables: ${missingVars.join(', ')}. Please check your .env file.`;
+  if (!appUrl) {
+    const error = 'Server configuration is missing required environment variable: NEXT_PUBLIC_APP_URL. Please check your .env file.';
     console.error(error);
-    // Return a JSON response with a 500 status
     return NextResponse.json({ error }, { status: 500 });
   }
 
   return NextResponse.json({
     appUrl,
-    clientId,
   });
 }

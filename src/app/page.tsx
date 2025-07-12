@@ -29,8 +29,13 @@ function LoginPage() {
         const { clientId, clientSecret } = credentials;
         const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-        if (!appUrl || !clientId || !clientSecret) {
-          throw new Error("Missing required configuration. Please provide your API keys.");
+        if (!appUrl) {
+          throw new Error("Application URL is not configured. Please contact the administrator.");
+        }
+
+        if (!clientId || !clientSecret) {
+          // This case should ideally not be hit if UI logic is correct, but it's a good safeguard.
+          throw new Error("Missing required Spotify keys. Please enter your credentials.");
         }
 
         const scopes = [
@@ -93,7 +98,7 @@ function LoginPage() {
             </div>
           ) : (
             <div className="flex flex-col space-y-3 w-full sm:w-auto">
-                {credentials ? (
+                {credentials && spotifyAuthUrl ? (
                     <Button size="lg" asChild>
                       <a href={spotifyAuthUrl}>
                         <LogIn className="mr-2 h-5 w-5" />
