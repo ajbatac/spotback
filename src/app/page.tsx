@@ -6,7 +6,19 @@ import React from 'react';
 export default function Home() {
   // These values MUST be set in your .env file for the authentication to work.
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9002';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  
+  // If the app url isn't set, we must show an error.
+  if (!appUrl) {
+    return (
+      <div>
+        <h1>Error: App URL is not configured.</h1>
+        <p>
+          Please make sure the <code>NEXT_PUBLIC_APP_URL</code> environment variable is set.
+        </p>
+      </div>
+    );
+  }
   
   // This is the specific callback endpoint that will handle the response from Spotify.
   // It MUST be added to your Spotify application's "Redirect URIs" in the Spotify Developer Dashboard.

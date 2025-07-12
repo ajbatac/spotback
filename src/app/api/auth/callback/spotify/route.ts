@@ -6,7 +6,12 @@ export async function GET(req: NextRequest) {
   const code = searchParams.get('code');
   const error = searchParams.get('error');
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9002';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+  if (!appUrl) {
+    return new Response('Error: App URL is not configured. Please set NEXT_PUBLIC_APP_URL.', { status: 500 });
+  }
+
   const rootUrl = new URL('/', appUrl);
 
   if (error) {
