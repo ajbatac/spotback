@@ -40,7 +40,7 @@ export function Header() {
                 <span className="hidden sm:inline">{user.display_name}</span>
             </div>
           )}
-          <Button variant="outline" onClick={logout}>
+          <Button variant="outline" onClick={logout} className="transition-all hover:bg-accent/80">
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>

@@ -180,7 +180,7 @@ export function Dashboard() {
              <p className="text-muted-foreground mt-1">{selectedPlaylists.size} of {playlists.length} selected</p>
           </div>
           {selectedPlaylists.size > 0 && !backupComplete && (
-            <Button onClick={handleBackup} disabled={isBackingUp} size="lg" className="shadow-md">
+            <Button onClick={handleBackup} disabled={isBackingUp} size="lg" className="shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
               {isBackingUp ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -201,15 +201,15 @@ export function Dashboard() {
              <h2 className="text-2xl font-semibold text-primary mb-3">Backup Complete!</h2>
              <p className="text-muted-foreground mb-4">Your selected playlists have been prepared for download.</p>
              <div className="flex flex-wrap gap-3 justify-center">
-              <Button variant="outline" onClick={() => handleDownload('json')}>
+              <Button variant="outline" onClick={() => handleDownload('json')} className="transition-all hover:bg-accent/80">
                 <FileJson2 className="mr-2 h-4 w-4" />
                 Download as .JSON
               </Button>
-              <Button variant="outline" onClick={() => handleDownload('xml')}>
+              <Button variant="outline" onClick={() => handleDownload('xml')} className="transition-all hover:bg-accent/80">
                 <FileCode2 className="mr-2 h-4 w-4" />
                 Download as .XML
               </Button>
-              <Button variant="outline" onClick={() => handleDownload('txt')}>
+              <Button variant="outline" onClick={() => handleDownload('txt')} className="transition-all hover:bg-accent/80">
                 <FileText className="mr-2 h-4 w-4" />
                 Download as .TXT (Links)
               </Button>
@@ -229,7 +229,7 @@ export function Dashboard() {
                     variant="success" 
                     size="lg"
                     onClick={() => { setBackupComplete(false); setSelectedPlaylists(new Set()); }} 
-                    className="shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+                    className="shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
                 >
                     <PlusCircle className="mr-2 h-5 w-5" />
                     Start a New Backup
