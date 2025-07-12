@@ -8,6 +8,7 @@ SpotBack is a web application built with Next.js that allows users to securely c
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Key Components & Functionality](#key-components--functionality)
+- [Can I Restore My Backup to Another Account?](#can-i-restore-my-backup-to-another-account)
 - [Project Dependencies](#project-dependencies)
 - [Environment Variables](#environment-variables)
 - [Getting Started (Local Development)](#getting-started-local-development)
@@ -22,12 +23,11 @@ SpotBack is a web application built with Next.js that allows users to securely c
 ## Features
 
 - **Secure Spotify OAuth 2.0 Login**: Connect your Spotify account securely.
-- **Beautiful, Responsive Landing Page**: A clean and simple interface for new users.
-- **Playlist & Top Artist Display**: (Coming Soon) View all your public and private playlists, along with your top artists.
-- **Selective Backup**: (Coming Soon) Choose one, multiple, or all playlists to back up.
-- **Multiple Export Formats**: (Coming Soon)
-- **AI-Powered Metadata Organization**: (Coming Soon) Utilizes Genkit to process and enhance playlist metadata for better readability.
+- **Playlist & Top Artist Display**: View all your public and private playlists.
+- **Selective Backup**: Choose one, multiple, or all playlists to back up.
+- **Multiple Export Formats**: Export playlists in their official JSON format or as XML.
 - **Responsive Design**: Fully functional on both desktop and mobile devices.
+- **AI-Powered Metadata Organization**: (Coming Soon) Utilizes Genkit to process and enhance playlist metadata for better readability.
 
 ## Tech Stack
 
@@ -58,12 +58,16 @@ The project follows a standard Next.js App Router structure, with logical separa
 │   │   ├── layout.tsx      # Root layout for the application
 │   │   └── page.tsx        # The main page component
 │   ├── components/
+│   │   ├── Dashboard.tsx   # Main component for the authenticated user view
+│   │   ├── Header.tsx      # Reusable header component
+│   │   ├── PlaylistCard.tsx# Component for displaying a single playlist
 │   │   └── ui/             # Reusable UI components from shadcn/ui
 │   ├── context/
 │   │   └── auth-context.tsx # React context for managing auth state
 │   ├── hooks/
 │   │   └── use-local-storage.ts # Hook for persisting state to localStorage
 │   ├── lib/
+│   │   ├── spotify.ts      # Client functions for interacting with the Spotify API
 │   │   └── utils.ts        # Utility functions (e.g., `cn` for Tailwind)
 ├── .env                    # Environment variables (MUST BE CREATED)
 ├── next.config.js          # Next.js configuration
@@ -77,8 +81,14 @@ The project follows a standard Next.js App Router structure, with logical separa
 - **`src/app/api/auth/callback/spotify/route.ts`**: The server-side API route that handles the OAuth 2.0 callback from Spotify. It exchanges the authorization code for an access token and securely redirects the user back to the main application page with the token in the URL parameters.
 - **`src/context/auth-context.tsx`**: A React Context provider that manages the global authentication state. It has the **single responsibility** of holding the Spotify access token. It uses the `use-local-storage` hook to persist the token, keeping the user logged in across browser sessions. This decouples the auth state management from the components that use it.
 - **`src/hooks/use-local-storage.ts`**: A generic custom hook that abstracts the logic of interacting with the browser's `localStorage`. This allows any piece of state to be persisted without rewriting boilerplate code, adhering to the **Don't Repeat Yourself (DRY)** principle.
-- **`src/lib/spotify.ts`**: (Coming Soon) A collection of server-side functions that act as a client for the Spotify Web API. It will include functions for fetching user profiles, playlists, and top artists, with built-in error handling for API responses.
+- **`src/lib/spotify.ts`**: A collection of server-side functions that act as a client for the Spotify Web API. It includes functions for fetching user profiles and playlists, with built-in error handling for API responses.
 - **`src/ai/flows/...`**: (Coming Soon) Genkit flows that take raw playlist metadata and use an AI model to return a well-structured and readable version.
+
+## Can I Restore My Backup to Another Account?
+
+**No, not directly.** The Spotify API does not have a feature to "upload" a backup file to restore playlists.
+
+However, the exported `.json` file contains all the necessary information (the playlist name, description, and a list of every track's unique Spotify URI) to rebuild your playlists. A future version of SpotBack could include a "Restore" feature that would read this file and programmatically create the playlists and add the songs to a different account. For now, the backup serves as a secure, personal record of your musical library.
 
 ## Project Dependencies
 
@@ -89,12 +99,16 @@ Here is a list of the primary dependencies used in this project:
 | `next`                | `14.2.0`   | The React framework for building the application.           |
 | `react`               | `18.2.0`   | A JavaScript library for building user interfaces.          |
 | `typescript`          | `^5`       | A typed superset of JavaScript that compiles to plain JS.   |
-| `tailwindcss`         | `^3.4.1`   | A utility-first CSS framework for rapid UI development.     |
+- `tailwindcss`         | `^3.4.1`   | A utility-first CSS framework for rapid UI development.     |
+| `@radix-ui/react-checkbox` | `^1.1.1` | A primitive component for creating accessible checkboxes. |
+| `@radix-ui/react-label`| `^2.1.0`   | An accessible label component for form inputs.              |
 | `@radix-ui/react-slot`| `^1.1.0`   | A primitive component for composing component slots.        |
 | `class-variance-authority` | `^0.7.0` | A library for creating variant-driven UI components.      |
 | `clsx`                | `^2.1.1`   | A tiny utility for constructing `className` strings conditionally.|
+| `js-file-download`    | `^0.4.12`  | A utility for triggering file downloads in the browser.     |
 | `lucide-react`        | `^0.411.0` | A library of simply beautiful open-source icons.            |
 | `tailwind-merge`      | `^2.4.0`   | A utility for merging Tailwind CSS classes.                 |
+| `@types/spotify-api`  | `^0.0.25`  | TypeScript definitions for the Spotify Web API.             |
 
 ## Environment Variables
 
