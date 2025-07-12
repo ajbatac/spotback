@@ -19,27 +19,18 @@ function LoginPage() {
 
   useEffect(() => {
     async function setupAuthUrl() {
+      // This function now exclusively uses credentials from the session.
+      // If there are no credentials, the button will direct the user to the credentials page.
+      if (!credentials) {
+          setIsReady(true);
+          return;
+      }
       try {
-        let clientId = credentials?.clientId;
-
-        // If no credentials in session, fetch from server config
-        if (!clientId) {
-          const response = await fetch('/api/config');
-           if (!response.ok) {
-              const config = await response.json();
-              throw new Error(config.error || `Server responded with status: ${response.status}`);
-            }
-            const config = await response.json();
-            if (config.error) {
-              throw new Error(config.error);
-            }
-            clientId = config.clientId;
-        }
-
+        const { clientId, clientSecret } = credentials;
         const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-        if (!appUrl || !clientId) {
-          throw new Error("Missing required configuration. Please provide your own keys or ensure the server is configured.");
+        if (!appUrl || !clientId || !clientSecret) {
+          throw new Error("Missing required configuration. Please provide your API keys.");
         }
 
         const scopes = [
@@ -58,12 +49,9 @@ function LoginPage() {
         authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
         authUrl.searchParams.append('show_dialog', 'true');
         
-        // If we're using session credentials, we need to pass them to the backend.
-        // The 'state' parameter is the standard way to do this in OAuth.
-        if (credentials?.clientSecret) {
-            const state = JSON.stringify({ clientId, clientSecret: credentials.clientSecret });
-            authUrl.searchParams.append('state', btoa(state)); // Base64 encode the state
-        }
+        // Pass credentials to the backend via the 'state' parameter
+        const state = JSON.stringify({ clientId, clientSecret });
+        authUrl.searchParams.append('state', btoa(state)); // Base64 encode the state
 
         setSpotifyAuthUrl(authUrl.toString());
       } catch (e: any) {
@@ -105,19 +93,21 @@ function LoginPage() {
             </div>
           ) : (
             <div className="flex flex-col space-y-3 w-full sm:w-auto">
-                <Button size="lg" asChild>
-                  <a href={spotifyAuthUrl}>
-                    <LogIn className="mr-2 h-5 w-5" />
-                    Login with Spotify
-                  </a>
-                </Button>
-                <p className="text-xs text-muted-foreground">or</p>
-                <Button size="lg" variant="outline" asChild>
-                    <Link href="/credentials">
-                        <KeyRound className="mr-2 h-5 w-5" />
-                        Use Your Own API Keys
-                    </Link>
-                </Button>
+                {credentials ? (
+                    <Button size="lg" asChild>
+                      <a href={spotifyAuthUrl}>
+                        <LogIn className="mr-2 h-5 w-5" />
+                        Login with Spotify
+                      </a>
+                    </Button>
+                ) : (
+                    <Button size="lg" asChild>
+                        <Link href="/credentials">
+                            <KeyRound className="mr-2 h-5 w-5" />
+                            Start by Entering Your API Keys
+                        </Link>
+                    </Button>
+                )}
             </div>
           )}
 

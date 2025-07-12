@@ -35,10 +35,10 @@ export default function CredentialsPage() {
             data-ai-hint="logo"
           />
           <h1 className="text-4xl font-bold tracking-tight text-gray-800">
-            Use Your Own Keys
+            Enter Your API Keys
           </h1>
           <p className="text-lg text-muted-foreground">
-            Enter your personal Spotify Developer Client ID and Secret to use SpotBack with your own API quota.
+            Provide your personal Spotify Developer keys to begin.
           </p>
 
           <form onSubmit={handleSubmit} className="w-full space-y-4 text-left">
@@ -75,14 +75,18 @@ export default function CredentialsPage() {
            <div className="pt-6 text-left border-t border-gray-200 mt-6 w-full">
              <h2 className="text-xl font-bold text-gray-800 text-center mb-3 flex items-center justify-center gap-2">
                 <HelpCircle className="h-5 w-5"/>
-                Why is this needed?
+                How to get your API Keys
             </h2>
             <p className="text-muted-foreground text-sm">
-              Spotify no longer allows new apps to be made public for individual developers. To use this tool, you must create your own "app" in the Spotify Developer Dashboard to get your own API keys.
+              Due to Spotify's developer policy, you must use your own API keys. This ensures all data access is explicitly approved by you, for you. Your keys are stored securely in your browser and are never saved on our server.
             </p>
-            <p className="text-muted-foreground mt-2 text-sm">
-              This ensures all data access is explicitly approved by you, for you. Your keys are stored securely in your browser session and are never saved on our server.
-            </p>
+            <ol className="list-decimal list-inside text-muted-foreground text-sm space-y-1 mt-2">
+                <li>Go to the <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Spotify Developer Dashboard</a> and log in.</li>
+                <li>Click "Create App" and give it a name and description.</li>
+                <li>Once created, you will see your <strong>Client ID</strong> and <strong>Client Secret</strong>. Copy them into the form above.</li>
+                <li>Go to "App Settings" and add a "Redirect URI": <strong>{process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback/spotify</strong></li>
+                <li>Finally, go to the "Users and Access" tab and add the email address of your Spotify account to the list of users.</li>
+            </ol>
             <div className="text-center mt-4">
                 <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-primary hover:underline">
                     Go to Spotify Developer Dashboard &rarr;
