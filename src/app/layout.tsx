@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { AuthProvider } from '@/context/auth-context';
 
 export const metadata: Metadata = {
   title: 'SpotBack',
@@ -13,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
