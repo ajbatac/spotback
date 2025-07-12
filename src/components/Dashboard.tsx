@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import fileDownload from 'js-file-download';
 import { Footer } from './Footer';
+import { jsonToXml } from '@/lib/utils';
 
 export function Dashboard() {
   const { accessToken, setUser } = useAuth();
@@ -71,44 +72,6 @@ export function Dashboard() {
       newSelection.delete(playlistId);
     }
     setSelectedPlaylists(newSelection);
-  };
-
-  const jsonToXml = (json: object): string => {
-    let xml = '';
-    const convert = (obj: any, indent: string) => {
-        for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                const value = obj[key];
-                const tag = key.replace(/[^a-zA-Z0-9_]/g, '_'); // Basic sanitization for tag names
-
-                if (value === null || value === undefined) {
-                    xml += `${indent}<${tag}/>\n`;
-                } else if (typeof value === 'object') {
-                    if (Array.isArray(value)) {
-                        value.forEach(item => {
-                            xml += `${indent}<${tag}>\n`;
-                            convert(item, indent + '  ');
-                            xml += `${indent}</${tag}>\n`;
-                        });
-                    } else {
-                        xml += `${indent}<${tag}>\n`;
-                        convert(value, indent + '  ');
-                        xml += `${indent}</${tag}>\n`;
-                    }
-                } else {
-                    const escapedValue = String(value)
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&apos;');
-                    xml += `${indent}<${tag}>${escapedValue}</${tag}>\n`;
-                }
-            }
-        }
-    };
-    convert(json, '  ');
-    return `<playlists>\n${xml}</playlists>`;
   };
   
   const handleBackup = () => {
