@@ -43,7 +43,13 @@ const nextConfig = {
         hostname: 'seeded-session-images.scdn.co',
         port: '',
         pathname: '/**',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'platform-lookaside.fbsbx.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

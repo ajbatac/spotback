@@ -2,10 +2,13 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { SpotifyUser } from '@/lib/spotify';
 
 interface AuthContextType {
   accessToken: string | null;
   setToken: (token: string | null) => void;
+  user: SpotifyUser | null;
+  setUser: (user: SpotifyUser | null) => void;
   logout: () => void;
 }
 
@@ -13,6 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useLocalStorage<string | null>('spotify-token', null);
+  const [user, setUser] = useLocalStorage<SpotifyUser | null>('spotify-user', null);
 
   const setToken = (token: string | null) => {
     setAccessToken(token);
@@ -20,12 +24,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setAccessToken(null);
-    // Potentially add other cleanup logic here
+    setUser(null);
   };
 
   const value = {
     accessToken,
     setToken,
+    user,
+    setUser,
     logout,
   };
 

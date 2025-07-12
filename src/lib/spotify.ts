@@ -1,6 +1,6 @@
-import type { Playlist } from 'spotify-api';
+import type { Playlist, User } from 'spotify-api';
 
-export type { Playlist as SpotifyPlaylist };
+export type { Playlist as SpotifyPlaylist, User as SpotifyUser };
 
 async function fetchAllPages<T>(initialUrl: string, accessToken: string): Promise<T[]> {
     let items: T[] = [];
@@ -32,4 +32,19 @@ export async function getPlaylists(accessToken: string): Promise<Playlist[]> {
     // but we are casting to the full Playlist type which is a superset and mostly compatible.
     // The API returns simplified playlist objects here.
     return await fetchAllPages<Playlist>(initialUrl, accessToken);
+}
+
+export async function getUserProfile(accessToken: string): Promise<User> {
+    const response = await fetch('https://api.spotify.com/v1/me', {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`Spotify API Error: ${error.error.message || response.statusText}`);
+    }
+
+    return await response.json();
 }

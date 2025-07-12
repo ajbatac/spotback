@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { getPlaylists, SpotifyPlaylist } from '@/lib/spotify';
+import { getPlaylists, SpotifyPlaylist, getUserProfile } from '@/lib/spotify';
 import { Header } from '@/components/Header';
 import { PlaylistCard } from '@/components/PlaylistCard';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ import {
 import fileDownload from 'js-file-download';
 
 export function Dashboard() {
-  const { accessToken } = useAuth();
+  const { accessToken, setUser } = useAuth();
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [selectedPlaylists, setSelectedPlaylists] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -31,19 +31,26 @@ export function Dashboard() {
   useEffect(() => {
     if (!accessToken) return;
 
-    const fetchPlaylists = async () => {
+    const fetchData = async () => {
       try {
-        const userPlaylists = await getPlaylists(accessToken);
+        // Fetch user profile and playlists in parallel
+        const [userProfile, userPlaylists] = await Promise.all([
+          getUserProfile(accessToken),
+          getPlaylists(accessToken),
+        ]);
+        
+        setUser(userProfile);
         setPlaylists(userPlaylists);
+
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch playlists.');
+        setError(err.message || 'Failed to fetch data from Spotify.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchPlaylists();
-  }, [accessToken]);
+    fetchData();
+  }, [accessToken, setUser]);
 
   const handleSelectAll = (checked: boolean | 'indeterminate') => {
     if (checked === true) {

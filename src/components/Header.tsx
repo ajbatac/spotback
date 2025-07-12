@@ -1,11 +1,12 @@
 'use client';
-
+import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
-import { LogOut, Music } from 'lucide-react';
+import { LogOut, Music, User as UserIcon } from 'lucide-react';
 
 export function Header() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const userImage = user?.images?.[0]?.url;
 
   return (
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-50 border-b">
@@ -19,10 +20,31 @@ export function Header() {
             <p className="text-xs text-muted-foreground -mt-1">Your musical memories, secured.</p>
           </div>
         </div>
-        <Button variant="outline" onClick={logout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </Button>
+        <div className="flex items-center gap-4">
+          {user && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                {userImage ? (
+                    <Image 
+                        src={userImage} 
+                        alt={user.display_name || 'User'}
+                        width={28}
+                        height={28}
+                        className="rounded-full"
+                        data-ai-hint="user avatar"
+                    />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
+                    <UserIcon className="w-4 h-4" />
+                  </div>
+                )}
+                <span className="hidden sm:inline">{user.display_name}</span>
+            </div>
+          )}
+          <Button variant="outline" onClick={logout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        </div>
       </nav>
     </header>
   );
