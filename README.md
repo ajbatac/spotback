@@ -157,8 +157,14 @@ The `apphosting.yaml` file configures the deployment settings for Firebase.
 
 ## Troubleshooting
 
+- **Error: `403 Forbidden` after logging in / User is `null` but Playlists load**: This is the most critical issue for new setups. By default, your Spotify app is in **Development Mode**. This means only users you have explicitly added to the allowlist can properly authenticate.
+  - **Solution**: Go to your [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), select your application, and go to the "Users and Access" tab. Click "Add New User" and add the email address and name for every person who needs to use the app. They will then be able to log in and grant the correct permissions.
+
 - **Error: `INVALID_CLIENT: Invalid redirect URI`**: This is the most common error. Double-check that the `NEXT_PUBLIC_APP_URL` in your `.env` file (or build environment) exactly matches one of the Redirect URIs you've configured in the Spotify Developer Dashboard. The full URI must be `http://your-url/api/auth/callback/spotify`.
+
 - **401 Unauthorized / Session Expired**: Spotify access tokens expire after one hour. The application currently requires you to log out and log back in to get a new one.
+
 - **Docker Build Fails**: Ensure Docker is running and that you have sufficient permissions to run Docker commands.
+
 - **Favicon Errors**: The application uses `src/app/icon.tsx` to generate the favicon, which is the recommended method for the Next.js App Router. If you see conflicts, ensure you do not have a `favicon.ico` file in the `public/` or `src/app/` directories.
 ```
