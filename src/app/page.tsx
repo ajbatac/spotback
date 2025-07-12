@@ -48,7 +48,7 @@ function LoginPage() {
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8">
+    <main className="flex min-h-screen flex-col items-center p-8 pt-20">
       <div className="flex flex-col items-center justify-center text-center space-y-6 max-w-lg mx-auto">
         <div className="bg-primary/20 p-4 rounded-full">
           <Music className="w-12 h-12 text-primary" />
