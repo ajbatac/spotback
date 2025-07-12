@@ -7,10 +7,15 @@ export async function GET(req: NextRequest) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
+  // This check MUST happen first. If appUrl is not set, we cannot construct
+  // the rootUrl to redirect to. This is a critical server configuration error.
   if (!appUrl) {
-    // This case should ideally not be hit if the config endpoint is working
-    // and the environment is set up.
-    return new Response('Error: App URL is not configured. Please set NEXT_PUBLIC_APP_URL.', { status: 500 });
+    // In this specific and critical case, we cannot redirect. We return a
+    // plain text error because the app's base URL is unknown.
+    return new Response(
+      'FATAL_ERROR: App URL is not configured. Please set NEXT_PUBLIC_APP_URL in your environment variables.',
+      { status: 500 }
+    );
   }
 
   const rootUrl = new URL('/', appUrl);
