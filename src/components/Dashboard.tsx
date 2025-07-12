@@ -8,7 +8,7 @@ import { PlaylistCard } from '@/components/PlaylistCard';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Info } from 'lucide-react';
 import fileDownload from 'js-file-download';
 
 export function Dashboard() {
@@ -181,6 +181,17 @@ export function Dashboard() {
               <Button variant="outline" onClick={() => handleDownload('json')}>Download as .JSON</Button>
               <Button variant="outline" onClick={() => handleDownload('xml')}>Download as .XML</Button>
              </div>
+             
+             <div className="mt-6 flex items-start gap-3 bg-background/50 p-4 rounded-md">
+                <Info className="w-5 h-5 mt-1 text-primary flex-shrink-0" />
+                <div>
+                    <h3 className="font-semibold text-primary-foreground">What's this for?</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        Your backup file contains the complete blueprint of your playlist, including all track IDs. While Spotify doesn't offer a direct "restore" feature, this file serves as a permanent record, allowing you or a future version of SpotBack to rebuild your playlists on any account.
+                    </p>
+                </div>
+             </div>
+
              <Button variant="link" onClick={() => { setBackupComplete(false); setSelectedPlaylists(new Set()); }} className="mt-4 px-0">Start a new backup</Button>
            </div>
         )}
