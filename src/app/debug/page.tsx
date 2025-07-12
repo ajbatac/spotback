@@ -66,6 +66,7 @@ export default function DebugPage() {
         authUrl.searchParams.append('client_id', clientId);
         authUrl.searchParams.append('scope', requestedScopes.join(' '));
         authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
+        authUrl.searchParams.append('show_dialog', 'true'); // Force re-approval of scopes
         setSpotifyAuthUrl(authUrl.toString());
     } catch (e: any) {
       setLoginConfigError(e.message || 'Failed to generate login URL.');

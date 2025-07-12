@@ -37,6 +37,7 @@ function LoginPage() {
       authUrl.searchParams.append('client_id', clientId);
       authUrl.searchParams.append('scope', scopes);
       authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
+      authUrl.searchParams.append('show_dialog', 'true'); // Force re-approval of scopes
       setSpotifyAuthUrl(authUrl.toString());
     } catch (e: any) {
       setConfigError(e.message || 'An unknown error occurred while preparing the login URL.');
