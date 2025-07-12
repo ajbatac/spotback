@@ -133,7 +133,7 @@ function LoginPage() {
               </p>
               <p className="text-muted-foreground mt-2">
                 This helps ensure security, compliance, and gives you full control over your data and access.{' '}
-                <Link href="/credentials" className="font-medium text-primary hover:underline">
+                <Link href="/credentials" className="font-medium text-gray-900 underline hover:text-primary">
                     Follow the instructions here to get started.
                 </Link>
               </p>

@@ -101,7 +101,7 @@ export default function CredentialsPage() {
               Due to Spotify's developer policy, you must use your own API keys. This ensures all data access is explicitly approved by you, for you. Your keys are stored securely in your browser and are never saved on our server.
             </p>
             <ol className="list-decimal list-inside text-muted-foreground text-sm space-y-2 mt-3">
-                <li>Go to the <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Spotify Developer Dashboard</a> and log in.</li>
+                <li>Go to the <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener noreferrer" className="font-medium text-gray-900 underline hover:text-primary">Spotify Developer Dashboard</a> and log in.</li>
                 <li>Click "Create App" and give it a name and description.</li>
                 <li>Once created, you will see your <strong>Client ID</strong> and <strong>Client Secret</strong>. Copy them into the form above.</li>
                 <li>Go to "App Settings" and add this exact "Redirect URI":
@@ -109,10 +109,10 @@ export default function CredentialsPage() {
                        {isClient ? <strong>{redirectUri}</strong> : 'Loading...'}
                     </div>
                 </li>
-                <li>Finally, go to the "Users and Access" tab and add the email address of your Spotify account to the list of users. This is required for apps in Development Mode.</li>
+                <li>Finally, go to the "Users and Access" tab and add the <strong>email address</strong> of your Spotify account. This is required for apps in Development Mode. Please use the email associated with your account, not an account number.</li>
             </ol>
             <div className="text-center mt-4">
-                <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-primary hover:underline">
+                <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-900 underline hover:text-primary">
                     Go to Spotify Developer Dashboard &rarr;
                 </a>
             </div>

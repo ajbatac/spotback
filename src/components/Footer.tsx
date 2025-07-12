@@ -6,6 +6,11 @@ export function Footer() {
   return (
     <footer className="bg-background/50 border-t pb-6">
       <div className="container mx-auto px-4 pt-6 text-center text-sm text-muted-foreground flex flex-col items-center">
+        <div className="mb-2">
+          <a href="https://buymeacoffee.com/emailsig" target="_blank" rel="noopener noreferrer" className="text-[11px] text-gray-900 underline hover:text-primary">
+            Support the creator, buy me a coffee
+          </a>
+        </div>
         <div className="mb-4">
           <Link href="https://buymeacoffee.com/emailsig" target="_blank" rel="noopener noreferrer">
             <Image
@@ -28,7 +33,7 @@ export function Footer() {
                 href="https://www.instagram.com/ajbatac"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-primary hover:underline underline-offset-4"
+                className="font-medium text-gray-900 underline hover:text-primary underline-offset-4"
             >
                 AJ Batac (@ajbatac)
             </a>{' '}
@@ -37,7 +42,7 @@ export function Footer() {
                 href="/changelog.html"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-primary hover:underline underline-offset-4"
+                className="font-medium text-gray-900 underline hover:text-primary underline-offset-4"
             >
                 (changelog)
             </Link>
