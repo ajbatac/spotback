@@ -1,10 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
+import { BuyMeACoffee } from './BuyMeACoffee';
 
 export function Footer() {
   return (
     <footer className="py-6 mt-auto bg-background/50 border-t">
       <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+        <BuyMeACoffee />
         <p>
           &copy; {new Date().getFullYear()} SpotBack. All Rights Reserved.
         </p>
