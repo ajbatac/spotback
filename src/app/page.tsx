@@ -19,8 +19,17 @@ function LoginPage() {
       try {
         const response = await fetch('/api/config');
         if (!response.ok) {
-          const config = await response.json().catch(() => ({ error: 'Failed to parse error response from server.' }));
-          throw new Error(config.error || `Server responded with status: ${response.status}`);
+          // Check if the response is JSON before trying to parse it
+          const contentType = response.headers.get('content-type');
+          let errorMsg = `Server responded with status: ${response.status}`;
+          if (contentType && contentType.includes('application/json')) {
+            const config = await response.json();
+            errorMsg = config.error || errorMsg;
+          } else {
+             // If the response is not JSON, it might be a server error page (HTML/text)
+             errorMsg = "An unexpected server error occurred. Please check server logs.";
+          }
+          throw new Error(errorMsg);
         }
         const config = await response.json();
         if (config.error) {
