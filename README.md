@@ -167,4 +167,3 @@ The `apphosting.yaml` file configures the deployment settings for Firebase.
 - **Docker Build Fails**: Ensure Docker is running and that you have sufficient permissions to run Docker commands.
 
 - **Favicon Errors**: The application uses `src/app/icon.tsx` to generate the favicon, which is the recommended method for the Next.js App Router. If you see conflicts, ensure you do not have a `favicon.ico` file in the `public/` or `src/app/` directories.
-```

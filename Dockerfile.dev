@@ -6,17 +6,17 @@ FROM node:18-alpine
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock)
+# Copy package.json and package-lock.json (or npm-shrinkwrap.json)
 COPY package*.json ./
 
-# Install project dependencies
+# Install app dependencies
 RUN npm install
 
-# Copy the rest of the application's code
+# Copy the rest of the application's source code from your host to your image filesystem.
 COPY . .
 
-# The Next.js app runs on port 9002 by default in our npm script
+# Make port 9002 available to the world outside this container
 EXPOSE 9002
 
-# The command to run the app in development mode with hot-reloading
+# Run the app when the container launches
 CMD ["npm", "run", "dev"]

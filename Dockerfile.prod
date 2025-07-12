@@ -1,44 +1,44 @@
 # Dockerfile for Production Environment
 
 # ---- Base ----
-# Use an official Node.js runtime as a parent image.
-# Alpine Linux is used for its small size.
 FROM node:18-alpine AS base
 WORKDIR /app
-
+COPY package*.json ./
 
 # ---- Dependencies ----
-# Install dependencies first, in a separate step to leverage Docker's layer caching.
 FROM base AS deps
-COPY package.json package-lock.json* ./
-RUN npm install --production
+RUN npm install --frozen-lockfile
 
-
-# ---- Builder ----
-# Build the Next.js application.
-FROM base AS builder
+# ---- Build ----
+FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# The build script will generate the .next folder with the production-ready app.
+# Set build-time arguments
+ARG NEXT_PUBLIC_SPOTIFY_CLIENT_ID
+ARG SPOTIFY_CLIENT_SECRET
+ARG NEXT_PUBLIC_APP_URL
+# Pass arguments to environment variables
+ENV NEXT_PUBLIC_SPOTIFY_CLIENT_ID=$NEXT_PUBLIC_SPOTIFY_CLIENT_ID
+ENV SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+# Build the Next.js application
 RUN npm run build
 
-
 # ---- Runner ----
-# The final, minimal image for running the application.
-FROM base AS runner
+FROM node:18-alpine AS runner
 WORKDIR /app
 
-# Set the environment to production
+# Set production environment
 ENV NODE_ENV=production
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Copy built assets from the 'build' stage
+COPY --from=build /app/public ./public
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./package.json
 
-# The Next.js app runs on port 9002 by default in our npm script
+# Expose the port the app runs on
 EXPOSE 9002
 
-# The command to run the production server.
-CMD ["node", "server.js"]
+# Start the application
+CMD ["npm", "start", "-p", "9002"]
