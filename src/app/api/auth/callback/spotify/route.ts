@@ -8,6 +8,8 @@ export async function GET(req: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
   if (!appUrl) {
+    // This case should ideally not be hit if the config endpoint is working
+    // and the environment is set up.
     return new Response('Error: App URL is not configured. Please set NEXT_PUBLIC_APP_URL.', { status: 500 });
   }
 
@@ -28,7 +30,8 @@ export async function GET(req: NextRequest) {
   const redirectUri = `${appUrl}/api/auth/callback/spotify`;
 
   if (!clientId || !clientSecret) {
-    rootUrl.searchParams.set('error', 'Spotify credentials are not set in environment variables');
+    const error_msg = "Server misconfiguration: Spotify credentials not set.";
+    rootUrl.searchParams.set('error', error_msg);
     return NextResponse.redirect(rootUrl);
   }
 
@@ -62,7 +65,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(rootUrl);
 
   } catch (e: any) {
-    rootUrl.searchParams.set('error', e.message || 'An unknown error occurred');
+    rootUrl.searchParams.set('error', e.message || 'An unknown error occurred during token exchange');
     return NextResponse.redirect(rootUrl);
   }
 }

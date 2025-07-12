@@ -9,8 +9,9 @@ export async function GET() {
   if (!clientId) missingVars.push('NEXT_PUBLIC_SPOTIFY_CLIENT_ID');
 
   if (missingVars.length > 0) {
-    const error = `Server configuration is missing required environment variables: ${missingVars.join(', ')}`;
+    const error = `Server configuration is missing required environment variables: ${missingVars.join(', ')}. Please check your .env file.`;
     console.error(error);
+    // Return a JSON response with a 500 status
     return NextResponse.json({ error }, { status: 500 });
   }
 

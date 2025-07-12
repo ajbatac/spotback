@@ -17,19 +17,23 @@ function HomePageContent() {
       try {
         const response = await fetch('/api/config');
         
+        // Check if the response is not OK (e.g., 500 error)
         if (!response.ok) {
+          // Try to get a specific error message from the JSON body
           const config = await response.json().catch(() => ({ error: 'Failed to parse error response from server.' }));
           throw new Error(config.error || `Server responded with status: ${response.status}`);
         }
         
         const config = await response.json();
         
+        // This check is redundant if the above handles non-ok, but good for safety
         if (config.error) {
             throw new Error(config.error);
         }
 
         const { appUrl, clientId } = config;
 
+        // This check is also mostly for safety, the API route should have validated this
         if (!appUrl || !clientId) {
             throw new Error('Required configuration (URL or Client ID) is missing from server response.');
         }
@@ -53,6 +57,7 @@ function HomePageContent() {
         setSpotifyAuthUrl(authUrl.toString());
 
       } catch (e: any) {
+        // Set the final error message to be displayed
         setConfigError(e.message || 'An unknown error occurred while fetching config.');
       }
     }
