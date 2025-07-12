@@ -1,8 +1,5 @@
-
-import type {NextConfig} from 'next';
-require('dotenv').config()
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
@@ -44,16 +41,6 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  webpack: (config, { isServer }) => {
-    // This is to ensure that the `fs` module can be used in server components.
-    if (!isServer) {
-        config.resolve.fallback = {
-            ...config.resolve.fallback,
-            fs: false,
-        };
-    }
-    return config;
-  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
