@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
-import { LogOut, Music, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon } from 'lucide-react';
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -12,7 +12,13 @@ export function Header() {
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-50 border-b">
       <nav className="container mx-auto px-4 flex justify-between items-center h-16">
         <div className="flex items-center gap-3">
-          <Music className="w-7 h-7 text-primary" />
+          <Image
+            src="/spotify.png"
+            alt="SpotBack Logo"
+            width={28}
+            height={28}
+            data-ai-hint="logo"
+          />
           <div>
             <h1 className="text-xl font-bold text-gray-800">
               Spot<span className="text-primary">Back</span>
