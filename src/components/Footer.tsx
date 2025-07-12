@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="bg-background/50 border-t pb-6">
       <div className="container mx-auto px-4 pt-6 text-center text-sm text-muted-foreground flex flex-col items-center">
         <div className="mb-4">
-          <Link href="https://buymeacoffee.com/emailsig" target="_blank">
+          <Link href="https://buymeacoffee.com/emailsig" target="_blank" rel="noopener noreferrer">
             <Image
                 src="/bmc_qr.png"
                 alt="Buy me a coffee QR code"
