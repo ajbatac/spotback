@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.0] - 2024-07-15
+## [0.3.0] - 2025-07-12
 
 ### Added
 - **Major Feature: "Bring Your Own Keys" (BYOK) Architecture.** The application now requires users to provide their own Spotify API credentials, making it usable by anyone without needing a publicly approved Spotify app.
