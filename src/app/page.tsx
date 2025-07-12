@@ -115,7 +115,7 @@ function LoginPage() {
             </div>
           )}
 
-          <div className="pt-8 text-left w-full">
+          <div className="pt-8 text-left w-full space-y-4">
             <div className="border rounded-lg p-6">
               <h2 className="text-xl font-bold text-gray-800 text-center mb-3">Why SpotBack?</h2>
               <p className="text-muted-foreground">
@@ -125,9 +125,6 @@ function LoginPage() {
                 It’s the simple way to backup your playlists so you never lose the songs that matter most.
               </p>
             </div>
-          </div>
-          
-          <div className="pt-2 text-left w-full">
             <div className="border rounded-lg p-6">
               <h2 className="text-xl font-bold text-gray-800 text-center mb-3">Why do I need to use my own API Keys?</h2>
               <p className="text-muted-foreground">
