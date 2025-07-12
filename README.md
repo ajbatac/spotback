@@ -123,7 +123,7 @@ SPOTIFY_CLIENT_SECRET="YOUR_SPOTIFY_CLIENT_SECRET"
 # For production, it must be the public URL of your deployed app.
 # IMPORTANT: You must add this URL (including the /api/auth/callback/spotify part)
 # to the "Redirect URIs" in your Spotify Developer Dashboard settings.
-NEXT_PUBLIC_APP_URL="https://spotback.website"
+NEXT_PUBLIC_APP_URL="https://6000-firebase-studio-1752167974752.cluster-hf4yr35cmnbd4vhbxvfvc6cp5q.cloudworkstations.dev"
 ```
 
 ## Getting Started (Local Development)
@@ -148,3 +148,4 @@ npm run build
 - **Error: `INVALID_CLIENT: Invalid redirect URI`**: This is the most common error. Double-check that the `NEXT_PUBLIC_APP_URL` in your `.env` file exactly matches one of the Redirect URIs you've configured in the Spotify Developer Dashboard. The full URI must be `http://your-url/api/auth/callback/spotify`.
 - **401 Unauthorized / Session Expired**: Spotify access tokens expire after one hour. The application currently requires you to log out and log back in to get a new one.
 - **Favicon Errors**: The application uses `src/app/icon.tsx` to generate the favicon, which is the recommended method for the Next.js App Router. If you see conflicts, ensure you do not have a `favicon.ico` file in the `public/` directory.
+
