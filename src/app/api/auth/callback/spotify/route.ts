@@ -1,17 +1,15 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
   const error = searchParams.get('error');
+  const state = searchParams.get('state');
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-  // This check MUST happen first. If appUrl is not set, we cannot construct
-  // the rootUrl to redirect to. This is a critical server configuration error.
   if (!appUrl) {
-    // In this specific and critical case, we cannot redirect. We return a
-    // plain text error because the app's base URL is unknown.
     return new Response(
       'FATAL_ERROR: App URL is not configured. Please set NEXT_PUBLIC_APP_URL in your environment variables.',
       { status: 500 }
@@ -29,16 +27,28 @@ export async function GET(req: NextRequest) {
     rootUrl.searchParams.set('error', 'Code not found in callback');
     return NextResponse.redirect(rootUrl);
   }
-
-  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
   
-  // Use the canonical NEXT_PUBLIC_APP_URL to construct the redirect URI.
-  // This must exactly match what is in the Spotify Developer Dashboard.
+  let clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+  let clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+
+  // If state contains credentials, use them instead of the server's default.
+  if (state) {
+    try {
+      const decodedState = JSON.parse(atob(state));
+      if (decodedState.clientId && decodedState.clientSecret) {
+        clientId = decodedState.clientId;
+        clientSecret = decodedState.clientSecret;
+      }
+    } catch (e) {
+      // Could be a normal state string, so we ignore the error
+      console.log("Could not parse state as JSON credentials, proceeding with default.");
+    }
+  }
+  
   const redirectUri = `${appUrl}/api/auth/callback/spotify`;
 
   if (!clientId || !clientSecret) {
-    const error_msg = "Server misconfiguration: Spotify credentials not set. Check server environment variables.";
+    const error_msg = "Server misconfiguration or missing keys: Spotify credentials not set. Please provide your own keys or check server environment variables.";
     rootUrl.searchParams.set('error', error_msg);
     return NextResponse.redirect(rootUrl);
   }
@@ -73,7 +83,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(rootUrl);
 
   } catch (e: any) {
-    // This catch block will now handle the "Unexpected token '<'" error if Spotify returns HTML
     const errorMessage = e.message.includes("JSON") 
       ? "Error communicating with Spotify. They returned an unexpected response. Please double-check that your Redirect URI is correctly configured in the Spotify Developer Dashboard."
       : (e.message || 'An unknown error occurred during token exchange');

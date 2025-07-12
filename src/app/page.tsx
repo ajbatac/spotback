@@ -6,43 +6,75 @@ import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
-import { LogIn } from 'lucide-react';
+import { LogIn, KeyRound } from 'lucide-react';
 import { Dashboard } from '@/components/Dashboard';
 import { Footer } from '@/components/Footer';
+import Link from 'next/link';
 
 function LoginPage() {
+  const { credentials } = useAuth();
   const [spotifyAuthUrl, setSpotifyAuthUrl] = useState('');
   const [configError, setConfigError] = useState('');
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    try {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-      const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+    async function setupAuthUrl() {
+      try {
+        let clientId = credentials?.clientId;
 
-      if (!appUrl || !clientId) {
-        throw new Error("Missing required configuration. Please check that NEXT_PUBLIC_APP_URL and NEXT_PUBLIC_SPOTIFY_CLIENT_ID are set in your environment.");
+        // If no credentials in session, fetch from server config
+        if (!clientId) {
+          const response = await fetch('/api/config');
+           if (!response.ok) {
+              const config = await response.json();
+              throw new Error(config.error || `Server responded with status: ${response.status}`);
+            }
+            const config = await response.json();
+            if (config.error) {
+              throw new Error(config.error);
+            }
+            clientId = config.clientId;
+        }
+
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+        if (!appUrl || !clientId) {
+          throw new Error("Missing required configuration. Please provide your own keys or ensure the server is configured.");
+        }
+
+        const scopes = [
+          'user-read-private',
+          'user-read-email',
+          'playlist-read-private',
+          'playlist-read-collaborative',
+          'user-top-read',
+        ].join(' ');
+
+        const constructedRedirectUri = `${appUrl}/api/auth/callback/spotify`;
+        const authUrl = new URL('https://accounts.spotify.com/authorize');
+        authUrl.searchParams.append('response_type', 'code');
+        authUrl.searchParams.append('client_id', clientId);
+        authUrl.searchParams.append('scope', scopes);
+        authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
+        authUrl.searchParams.append('show_dialog', 'true');
+        
+        // If we're using session credentials, we need to pass them to the backend.
+        // The 'state' parameter is the standard way to do this in OAuth.
+        if (credentials?.clientSecret) {
+            const state = JSON.stringify({ clientId, clientSecret: credentials.clientSecret });
+            authUrl.searchParams.append('state', btoa(state)); // Base64 encode the state
+        }
+
+        setSpotifyAuthUrl(authUrl.toString());
+      } catch (e: any) {
+        setConfigError(e.message || 'An unknown error occurred while preparing the login URL.');
+      } finally {
+        setIsReady(true);
       }
-
-      const scopes = [
-        'user-read-private',
-        'user-read-email',
-        'playlist-read-private',
-        'playlist-read-collaborative',
-        'user-top-read',
-      ].join(' ');
-
-      const constructedRedirectUri = `${appUrl}/api/auth/callback/spotify`;
-      const authUrl = new URL('https://accounts.spotify.com/authorize');
-      authUrl.searchParams.append('response_type', 'code');
-      authUrl.searchParams.append('client_id', clientId);
-      authUrl.searchParams.append('scope', scopes);
-      authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
-      authUrl.searchParams.append('show_dialog', 'true'); // Force re-approval of scopes
-      setSpotifyAuthUrl(authUrl.toString());
-    } catch (e: any) {
-      setConfigError(e.message || 'An unknown error occurred while preparing the login URL.');
     }
-  }, []);
+
+    setupAuthUrl();
+  }, [credentials]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -62,22 +94,31 @@ function LoginPage() {
             Your go-to Spotify helper. Backup your playlists and music memories fast — like, literally 3 clicks and you're done.
           </p>
 
-          {configError ? (
+          {!isReady ? (
+             <Button size="lg" disabled>
+              Loading...
+            </Button>
+          ) : configError ? (
             <div className="text-red-500 bg-red-100 p-4 rounded-md">
               <p className="font-bold">Configuration Error</p>
               <p>{configError}</p>
             </div>
-          ) : spotifyAuthUrl ? (
-            <Button size="lg" asChild>
-              <a href={spotifyAuthUrl}>
-                <LogIn className="mr-2 h-5 w-5" />
-                Login with Spotify
-              </a>
-            </Button>
           ) : (
-            <Button size="lg" disabled>
-              Loading...
-            </Button>
+            <div className="flex flex-col space-y-3 w-full sm:w-auto">
+                <Button size="lg" asChild>
+                  <a href={spotifyAuthUrl}>
+                    <LogIn className="mr-2 h-5 w-5" />
+                    Login with Spotify
+                  </a>
+                </Button>
+                <p className="text-xs text-muted-foreground">or</p>
+                <Button size="lg" variant="outline" asChild>
+                    <Link href="/credentials">
+                        <KeyRound className="mr-2 h-5 w-5" />
+                        Use Your Own API Keys
+                    </Link>
+                </Button>
+            </div>
           )}
 
           <div className="pt-8 text-left border-t border-gray-200 mt-8">
