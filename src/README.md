@@ -124,7 +124,7 @@ SPOTIFY_CLIENT_SECRET="YOUR_SPOTIFY_CLIENT_SECRET"
 # For production, it must be the public URL of your deployed app.
 # IMPORTANT: You must add this URL (including the /api/auth/callback/spotify part)
 # to the "Redirect URIs" in your Spotify Developer Dashboard settings.
-NEXT_PUBLIC_APP_URL="https://6000-firebase-studio-1752167974752.cluster-hf4yr35cmnbd4vhbxvfvc6cp5q.cloudworkstations.dev"
+NEXT_PUBLIC_APP_URL="https://spotback.website"
 ```
 
 ## Getting Started (Local Development)
