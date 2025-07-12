@@ -43,24 +43,15 @@ export function Dashboard() {
       setError(null);
       
       try {
-        // First, fetch the user profile. This is for display only.
-        // A failure here should not break the entire app.
         const userProfile = await getUserProfile(accessToken);
         setUser(userProfile);
-      } catch (err: any) {
-          console.error("Failed to fetch user profile:", err);
-          // Non-critical error: Log it, but don't log out the user.
-          // The app can still function without the user's name in the header.
-      }
-      
-      // Second, fetch playlists. This is critical data.
-      // If this fails, we show an error to the user and suggest a re-login.
-      try {
+        
         const userPlaylists = await getPlaylists(accessToken);
         setPlaylists(userPlaylists);
+
       } catch (err: any) {
-        console.error("Failed to fetch playlists:", err);
-        setError(err.message || 'Failed to fetch your playlists from Spotify. The API might be temporarily down, or your session may have expired.');
+        console.error("Failed to fetch data from Spotify:", err);
+        setError(err.message || 'Failed to fetch your data from Spotify. The API might be temporarily down, or your session may have expired.');
         // Do NOT logout automatically, as that causes the redirect loop.
         // Let the user decide to log out.
       } finally {
