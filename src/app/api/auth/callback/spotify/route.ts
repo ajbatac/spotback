@@ -33,11 +33,9 @@ export async function GET(req: NextRequest) {
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
   
-  // Dynamically construct the redirect URI from the request headers
-  // to ensure it matches what Spotify expects, even behind a proxy.
-  const host = req.headers.get('host');
-  const proto = req.headers.get('x-forwarded-proto') || 'http';
-  const redirectUri = `${proto}://${host}/api/auth/callback/spotify`;
+  // Use the canonical NEXT_PUBLIC_APP_URL to construct the redirect URI.
+  // This must exactly match what is in the Spotify Developer Dashboard.
+  const redirectUri = `${appUrl}/api/auth/callback/spotify`;
 
   if (!clientId || !clientSecret) {
     const error_msg = "Server misconfiguration: Spotify credentials not set. Check server environment variables.";
@@ -55,7 +53,7 @@ export async function GET(req: NextRequest) {
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x--form-urlencoded',
+        'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64'),
       },
       body: requestBody,
@@ -64,7 +62,7 @@ export async function GET(req: NextRequest) {
     const responseData = await response.json();
     
     if (!response.ok) {
-       const errorDescription = responseData.error_description || 'Failed to fetch access token';
+       const errorDescription = responseData.error_description || 'Failed to fetch access token from Spotify. Please ensure the Redirect URI in your Spotify Dashboard is set correctly.';
        rootUrl.searchParams.set('error', errorDescription);
        return NextResponse.redirect(rootUrl);
     } 
@@ -75,7 +73,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(rootUrl);
 
   } catch (e: any) {
-    rootUrl.searchParams.set('error', e.message || 'An unknown error occurred during token exchange');
+    // This catch block will now handle the "Unexpected token '<'" error if Spotify returns HTML
+    const errorMessage = e.message.includes("JSON") 
+      ? "Error communicating with Spotify. They returned an unexpected response. Please double-check that your Redirect URI is correctly configured in the Spotify Developer Dashboard."
+      : (e.message || 'An unknown error occurred during token exchange');
+    rootUrl.searchParams.set('error', errorMessage);
     return NextResponse.redirect(rootUrl);
   }
 }
