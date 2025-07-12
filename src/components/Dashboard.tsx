@@ -101,7 +101,7 @@ export function Dashboard() {
       const dataToDownload = JSON.stringify(backedUpPlaylists, null, 2);
       fileDownload(dataToDownload, `spotify_backup_${timestamp}.json`);
     } else if (format === 'xml') {
-      const xmlData = jsonToXml({ playlist: backedUp playlists });
+      const xmlData = jsonToXml({ playlist: backedUpPlaylists });
       fileDownload(xmlData, `spotify_backup_${timestamp}.xml`);
     } else if (format === 'txt') {
         const urls = backedUpPlaylists
