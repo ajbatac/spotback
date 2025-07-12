@@ -51,7 +51,7 @@ function LoginPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <main className="flex-grow flex flex-col items-center p-8 text-center pt-20">
+      <main className="flex-grow flex flex-col items-center p-8 text-center pt-10">
         <div className="flex flex-col items-center space-y-6 max-w-lg mx-auto">
           <div className="bg-primary/20 p-4 rounded-full">
             <Music className="w-12 h-12 text-primary" />
