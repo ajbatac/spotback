@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
+import { LogIn } from 'lucide-react';
 
 export default function DebugPage() {
   const { accessToken, user, logout } = useAuth();
@@ -11,6 +12,8 @@ export default function DebugPage() {
   const [isFetchingConfig, setIsFetchingConfig] = useState(false);
   const [configError, setConfigError] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const [spotifyAuthUrl, setSpotifyAuthUrl] = useState('');
+  const [loginConfigError, setLoginConfigError] = useState('');
 
   useEffect(() => {
     // This effect runs only on the client, after the initial render.
@@ -24,8 +27,6 @@ export default function DebugPage() {
     setIsFetchingConfig(true);
     try {
       const res = await fetch('/api/config');
-      // IMPORTANT: We fetch as raw text to see exactly what the server sends,
-      // avoiding the JSON parsing error we're trying to debug.
       const text = await res.text(); 
       setConfigResponse(text);
     } catch (e: any) {
@@ -34,10 +35,48 @@ export default function DebugPage() {
         setIsFetchingConfig(false);
     }
   };
+  
+  const generateLoginUrl = async () => {
+    setLoginConfigError('');
+    try {
+      const response = await fetch('/api/config');
+       if (!response.ok) {
+          const config = await response.json();
+          throw new Error(config.error || `Server responded with status: ${response.status}`);
+        }
+        const config = await response.json();
+        if (config.error) {
+          throw new Error(config.error);
+        }
+        const { appUrl, clientId } = config;
+
+        const scopes = [
+          'user-read-private',
+          'user-read-email',
+          'playlist-read-private',
+          'playlist-read-collaborative',
+          'user-top-read',
+        ].join(' ');
+
+        const constructedRedirectUri = `${appUrl}/api/auth/callback/spotify`;
+        const authUrl = new URL('https://accounts.spotify.com/authorize');
+        authUrl.searchParams.append('response_type', 'code');
+        authUrl.searchParams.append('client_id', clientId);
+        authUrl.searchParams.append('scope', scopes);
+        authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
+        setSpotifyAuthUrl(authUrl.toString());
+    } catch (e: any) {
+      setLoginConfigError(e.message || 'Failed to generate login URL.');
+    }
+  };
+
 
   useEffect(() => {
     fetchConfig();
-  }, []);
+    if (!accessToken) {
+      generateLoginUrl();
+    }
+  }, [accessToken]);
 
   return (
     <div className="container mx-auto p-8 font-mono bg-gray-50 min-h-screen">
@@ -66,7 +105,23 @@ export default function DebugPage() {
                   {user ? JSON.stringify(user, null, 2) : 'null'}
                 </pre>
               </div>
-              {accessToken && <Button variant="destructive" size="sm" onClick={logout} className="mt-2">Logout</Button>}
+              {accessToken ? (
+                <Button variant="destructive" size="sm" onClick={logout} className="mt-2">Logout</Button>
+              ) : loginConfigError ? (
+                 <div className="text-red-500 bg-red-100 p-2 rounded-md text-xs mt-2">
+                    <p className="font-bold">Could not generate login URL:</p>
+                    <p>{loginConfigError}</p>
+                 </div>
+              ) : spotifyAuthUrl ? (
+                <Button size="sm" asChild className="mt-2">
+                  <a href={spotifyAuthUrl}>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Login with Spotify
+                  </a>
+                </Button>
+              ) : (
+                 <Button size="sm" disabled className="mt-2">Loading Login...</Button>
+              )}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">Loading auth state...</p>
