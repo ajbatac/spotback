@@ -12,68 +12,95 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f9f9f9;
         }
         h1, h2, h3 {
-            border-bottom: 1px solid #eaecef;
-            padding-bottom: .3em;
+            color: #1DB954; /* Spotify Green */
+        }
+        h1 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-top: 1.5em;
+        }
+        h3 {
+            font-size: 1.2em;
+            margin-top: 1em;
+            border-left: 3px solid #1DB954;
+            padding-left: 10px;
+        }
+        ul {
+            list-style-type: '✓  ';
+            padding-left: 20px;
         }
         code {
-            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-            background-color: #f6f8fa;
-            padding: .2em .4em;
-            margin: 0;
-            font-size: 85%;
-            border-radius: 3px;
-        }
-        pre {
-            background-color: #f6f8fa;
-            padding: 16px;
-            overflow: auto;
-            border-radius: 3px;
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 4px;
         }
         a {
-            color: #0366d6;
+            color: #1DB954;
             text-decoration: none;
         }
         a:hover {
             text-decoration: underline;
         }
+        .header {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+        .version-section {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5em;
+            margin-bottom: 1.5em;
+        }
     </style>
 </head>
 <body>
-    <h1>SpotBack Changelog</h1>
-    <p>All notable changes to this project will be documented in this file.</p>
-    <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/" target="_blank" rel="noopener noreferrer">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html" target="_blank" rel="noopener noreferrer">Semantic Versioning</a>.</p>
-    
-    <h2>[1.0.0] - 2024-08-01</h2>
-    
-    <h3>Added</h3>
-    <ul>
-        <li><strong>Initial Release</strong> of SpotBack!</li>
-        <li>Secure Spotify OAuth 2.0 authentication.</li>
-        <li>Fetches and displays all user playlists and top artists.</li>
-        <li>Select one, multiple, or all playlists for backup.</li>
-        <li>Export selected playlists to CSV, JSON, ZIP, and official Spotify API formats.</li>
-        <li>Beautiful, responsive landing page for new users.</li>
-        <li>User-friendly dashboard to manage playlists.</li>
-        <li>"Buy me a pizza" support widget.</li>
-        <li>Comprehensive <code>README.md</code> documentation.</li>
-        <li>Docker support for both development (<code>Dockerfile.dev</code>) and production (<code>Dockerfile.prod</code>).</li>
-        <li>Docker Compose (<code>docker-compose.yml</code>) for easy local development setup.</li>
-        <li>Publicly accessible changelog page.</li>
-        <li>AI-powered metadata organization flow (currently placeholder).</li>
-    </ul>
+    <div class="header">
+        <h1>SpotBack Changelog</h1>
+        <p>All notable changes to this project will be documented in this file.</p>
+        <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/" target="_blank" rel="noopener noreferrer">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html" target="_blank" rel="noopener noreferrer">Semantic Versioning</a>.</p>
+    </div>
 
-    <h3>Changed</h3>
-    <ul>
-        <li>Improved error handling for Spotify API rate limits and server errors (e.g., 504 Gateway Timeout).</li>
-        <li>Refined UI/UX for a smoother, more intuitive experience.</li>
-        <li>Updated color scheme to a vibrant, Spotify-inspired theme.</li>
-    </ul>
+    <div class="version-section">
+        <h2>[0.2.0] - 2024-08-01</h2>
+        <h3>Added</h3>
+        <ul>
+            <li>QR code in the footer is now a clickable link to support the creator.</li>
+        </ul>
+        <h3>Changed</h3>
+        <ul>
+            <li>Improved UI consistency for all primary action buttons.</li>
+            <li>Increased size of the footer QR code for better visibility and usability.</li>
+        </ul>
+        <h3>Fixed</h3>
+        <ul>
+            <li>Corrected page layout to ensure footer sits directly below content, not at the bottom of the viewport.</li>
+            <li>Adjusted login page alignment to position content higher on the screen.</li>
+        </ul>
+    </div>
 
-    <h3>Fixed</h3>
-    <ul>
-        <li>Resolved multiple issues with the "Buy me a pizza" widget not appearing correctly by embedding it in an <code>&lt;iframe&gt;</code>.</li>
-    </ul>
+    <div class="version-section">
+        <h2>[0.1.0] - 2024-08-01</h2>
+        <h3>Added</h3>
+        <ul>
+            <li><strong>Initial Release</strong> of SpotBack!</li>
+            <li>Secure Spotify OAuth 2.0 authentication.</li>
+            <li>Fetches and displays user profile and all user playlists.</li>
+            <li>Select one, multiple, or all playlists for backup.</li>
+            <li>User-friendly dashboard to manage playlists and backups.</li>
+            <li>Export selected playlists to JSON, XML, or a TXT file of URLs.</li>
+            <li>Responsive landing page and dashboard.</li>
+            <li>Header with user info and footer with project credits.</li>
+            <li>Consistent UI theme with styled buttons, icons, and hover animations.</li>
+            <li>Comprehensive <code>README.md</code> documentation and a public changelog.</li>
+        </ul>
+    </div>
+
 </body>
 </html>
