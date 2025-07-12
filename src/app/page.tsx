@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { Suspense, useEffect, useState } from 'react';
@@ -17,12 +16,13 @@ function HomePageContent() {
     async function fetchConfig() {
       try {
         const response = await fetch('/api/config');
-        const config = await response.json();
-
+        
         if (!response.ok) {
-          // If response is not ok, throw an error with the message from the API
-          throw new Error(config.error || 'Failed to fetch server configuration');
+          const config = await response.json().catch(() => ({ error: 'Failed to parse error response from server.' }));
+          throw new Error(config.error || `Server responded with status: ${response.status}`);
         }
+        
+        const config = await response.json();
         
         if (config.error) {
             throw new Error(config.error);

@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -11,6 +10,7 @@ export async function GET() {
 
   if (missingVars.length > 0) {
     const error = `Server configuration is missing required environment variables: ${missingVars.join(', ')}`;
+    console.error(error);
     return NextResponse.json({ error }, { status: 500 });
   }
 
