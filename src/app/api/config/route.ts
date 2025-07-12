@@ -5,11 +5,13 @@ export async function GET() {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
 
-  if (!appUrl || !clientId) {
-    return NextResponse.json(
-      { error: 'Server configuration is missing required environment variables.' },
-      { status: 500 }
-    );
+  const missingVars = [];
+  if (!appUrl) missingVars.push('NEXT_PUBLIC_APP_URL');
+  if (!clientId) missingVars.push('NEXT_PUBLIC_SPOTIFY_CLIENT_ID');
+
+  if (missingVars.length > 0) {
+    const error = `Server configuration is missing required environment variables: ${missingVars.join(', ')}`;
+    return NextResponse.json({ error }, { status: 500 });
   }
 
   return NextResponse.json({

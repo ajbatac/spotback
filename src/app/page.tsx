@@ -17,10 +17,12 @@ function HomePageContent() {
     async function fetchConfig() {
       try {
         const response = await fetch('/api/config');
-        if (!response.ok) {
-          throw new Error('Failed to fetch server configuration');
-        }
         const config = await response.json();
+
+        if (!response.ok) {
+          // If response is not ok, throw an error with the message from the API
+          throw new Error(config.error || 'Failed to fetch server configuration');
+        }
         
         if (config.error) {
             throw new Error(config.error);
@@ -29,7 +31,7 @@ function HomePageContent() {
         const { appUrl, clientId } = config;
 
         if (!appUrl || !clientId) {
-            throw new Error('Required configuration (URL or Client ID) is missing.');
+            throw new Error('Required configuration (URL or Client ID) is missing from server response.');
         }
 
         const scopes = [
