@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
-import { Music } from 'lucide-react';
+import { LogOut, Music } from 'lucide-react';
 
 export function Header() {
   const { logout } = useAuth();
@@ -20,6 +20,7 @@ export function Header() {
           </div>
         </div>
         <Button variant="outline" onClick={logout}>
+          <LogOut className="mr-2 h-4 w-4" />
           Logout
         </Button>
       </nav>
