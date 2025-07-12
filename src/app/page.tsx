@@ -89,7 +89,12 @@ function HomePageContent() {
   const tokenFromUrl = searchParams.get('access_token');
   const errorFromUrl = searchParams.get('error');
   const [error, setError] = useState('');
+  const [isClient, setIsClient] = useState(false);
 
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
   useEffect(() => {
     if (tokenFromUrl) {
       setToken(tokenFromUrl);
@@ -112,6 +117,11 @@ function HomePageContent() {
         <a href="/">Try Again</a>
       </div>
     );
+  }
+  
+  if (!isClient) {
+    // Render nothing or a loading spinner on the server and initial client render
+    return null;
   }
   
   return accessToken ? <Dashboard /> : <LoginPage />;
