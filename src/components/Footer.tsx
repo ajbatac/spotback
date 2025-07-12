@@ -25,7 +25,7 @@ export function Footer() {
             <p className="mt-1">
             Created with ❤️ by{' '}
             <a
-                href="https.www.instagram.com/ajbatac"
+                href="https://www.instagram.com/ajbatac"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-medium text-primary hover:underline underline-offset-4"
