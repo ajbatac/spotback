@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { getPlaylists, type SpotifyPlaylist } from '@/lib/spotify';
+import { getPlaylists } from '@/lib/spotify';
+import type { SpotifyPlaylist } from '@/lib/spotify';
 import { Header } from '@/components/Header';
 import { PlaylistCard } from '@/components/PlaylistCard';
 import { Button } from '@/components/ui/button';
@@ -166,7 +167,7 @@ export function Dashboard() {
              <p className="text-muted-foreground mt-1">{selectedPlaylists.size} of {playlists.length} selected</p>
           </div>
           {selectedPlaylists.size > 0 && !backupComplete && (
-            <Button onClick={handleBackup} disabled={isBackingUp} size="lg">
+            <Button onClick={handleBackup} disabled={isBackingUp} size="lg" className="shadow-md">
               {isBackingUp ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
