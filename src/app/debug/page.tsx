@@ -10,6 +10,13 @@ export default function DebugPage() {
   const [configResponse, setConfigResponse] = useState('');
   const [isFetchingConfig, setIsFetchingConfig] = useState(false);
   const [configError, setConfigError] = useState('');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // This effect runs only on the client, after the initial render.
+    // This safely gates the rendering of components that depend on client-side state.
+    setIsClient(true);
+  }, []);
 
   const fetchConfig = async () => {
     setConfigResponse('');
@@ -50,16 +57,20 @@ export default function DebugPage() {
         {/* Authentication Context Section */}
         <section className="mb-8 p-4 border rounded-lg bg-white shadow-sm">
           <h2 className="text-xl font-semibold mb-3 text-gray-700 border-b pb-2">Authentication Context</h2>
-          <div className="space-y-2 text-sm">
-            <p><strong>Access Token:</strong> <span className="text-green-600 break-all">{accessToken || 'Not Set'}</span></p>
-            <div>
-              <strong>User Object:</strong>
-              <pre className="mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto">
-                {user ? JSON.stringify(user, null, 2) : 'null'}
-              </pre>
+          {isClient ? (
+            <div className="space-y-2 text-sm">
+              <p><strong>Access Token:</strong> <span className="text-green-600 break-all">{accessToken || 'Not Set'}</span></p>
+              <div>
+                <strong>User Object:</strong>
+                <pre className="mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto">
+                  {user ? JSON.stringify(user, null, 2) : 'null'}
+                </pre>
+              </div>
+              {accessToken && <Button variant="destructive" size="sm" onClick={logout} className="mt-2">Logout</Button>}
             </div>
-            {accessToken && <Button variant="destructive" size="sm" onClick={logout} className="mt-2">Logout</Button>}
-          </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Loading auth state...</p>
+          )}
         </section>
 
         {/* API Response Section */}
