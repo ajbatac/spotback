@@ -1,8 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Music, ListMusic, FileJson, FileArchive } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { ListMusic, FileArchive } from 'lucide-react';
 import Image from 'next/image';
 
 const handleLogin = () => {
@@ -31,7 +31,6 @@ const handleLogin = () => {
   
   window.location.href = spotifyAuthUrl.toString();
 };
-
 
 export default function Home() {
   return (
@@ -98,7 +97,7 @@ export default function Home() {
                   <CardTitle>Comprehensive Backups</CardTitle>
                   <CardDescription>
                     Select any or all of your playlists for backup. SpotBack fetches the complete tracklist, including song titles, artists, and albums.
-                  </g CardDescription>
+                  </CardDescription>
                 </CardHeader>
               </Card>
               <Card>
