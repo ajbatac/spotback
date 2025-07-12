@@ -3,26 +3,34 @@ import type { Playlist, User } from 'spotify-api';
 // Re-exporting the official types with a more friendly name for use in the app
 export type { Playlist as SpotifyPlaylist, User as SpotifyUser };
 
-// A generic fetch wrapper to handle Spotify API calls, authentication, and error handling.
+// A generic fetch wrapper to handle Spotify API calls, authentication, and detailed error handling.
 async function spotifyFetch(url: string, accessToken: string) {
     const response = await fetch(url, {
         headers: {
-            // Ensure the Authorization header is formatted exactly as "Bearer <token>"
             'Authorization': `Bearer ${accessToken}`,
         },
     });
 
     if (!response.ok) {
-        // If the response is not OK, try to parse the error JSON from Spotify
+        // If the response is not OK, try to extract a detailed error message.
+        let errorMessage;
         try {
+            // First, try to parse the error as JSON, which is the expected format.
             const error = await response.json();
-            // Construct a detailed error message from the Spotify API response
-            const message = error.error?.message || `Spotify API Error: ${response.status} ${response.statusText}`;
-            throw new Error(message);
+            errorMessage = error.error?.message || `Spotify API Error: ${response.status} ${response.statusText}`;
         } catch (e) {
-            // If parsing the error JSON fails, throw a generic error
-            throw new Error(`Spotify API Error: ${response.status} ${response.statusText}. The response was not valid JSON.`);
+            // If parsing as JSON fails, it's likely an HTML error page. Read it as text.
+            const errorText = await response.text();
+            // Create a more informative error message from the HTML body if possible.
+            const titleMatch = errorText.match(/<title>(.*?)<\/title>/i);
+            const bodyMatch = errorText.match(/<div id="message">(.*?)<\/div>/i);
+            if (titleMatch && bodyMatch) {
+              errorMessage = `Spotify returned an HTML error page: ${titleMatch[1]} - ${bodyMatch[1]}`;
+            } else {
+              errorMessage = `Spotify API Error: ${response.status} ${response.statusText}. The response was not valid JSON.`;
+            }
         }
+        throw new Error(errorMessage);
     }
 
     // If the response is OK, return the JSON data

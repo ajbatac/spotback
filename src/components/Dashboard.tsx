@@ -84,7 +84,7 @@ export function Dashboard() {
     };
 
     fetchData();
-  }, [accessToken, setUser]);
+  }, [accessToken, setUser, user]);
 
   const handleSelectAll = (checked: boolean | 'indeterminate') => {
     if (checked === true) {
