@@ -115,27 +115,31 @@ function LoginPage() {
             </div>
           )}
 
-          <div className="pt-8 text-left border-t border-gray-200 mt-8 w-full">
-            <h2 className="text-xl font-bold text-gray-800 text-center mb-3">Why SpotBack?</h2>
-            <p className="text-muted-foreground">
-              Losing your Spotify playlists can feel like losing a piece of your personality. Whether your account gets hacked, your phone crashes, or you just switch devices, SpotBack makes sure your music stays with you.
-            </p>
-            <p className="text-muted-foreground mt-2">
-              It’s the simple way to backup your playlists so you never lose the songs that matter most.
-            </p>
+          <div className="pt-8 text-left w-full">
+            <div className="border rounded-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 text-center mb-3">Why SpotBack?</h2>
+              <p className="text-muted-foreground">
+                Losing your Spotify playlists can feel like losing a piece of your personality. Whether your account gets hacked, your phone crashes, or you just switch devices, SpotBack makes sure your music stays with you.
+              </p>
+              <p className="text-muted-foreground mt-2">
+                It’s the simple way to backup your playlists so you never lose the songs that matter most.
+              </p>
+            </div>
           </div>
           
-          <div className="pt-8 text-left border-t border-gray-200 mt-8 w-full">
-            <h2 className="text-xl font-bold text-gray-800 text-center mb-3">Why do I need to use my own API Keys?</h2>
-            <p className="text-muted-foreground">
-              Spotify requires every app, even for personal use, to have a registered developer application. While you can use SpotBack as an individual, you’ll need to create your own free Spotify Developer account and generate your own client ID and secret key.
-            </p>
-             <p className="text-muted-foreground mt-2">
-              This helps ensure security, compliance, and gives you full control over your data and access. {' '}
-              <Link href="/credentials" className="font-medium text-primary hover:underline">
-                  Follow the instructions here to get started.
-              </Link>
-            </p>
+          <div className="pt-2 text-left w-full">
+            <div className="border rounded-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 text-center mb-3">Why do I need to use my own API Keys?</h2>
+              <p className="text-muted-foreground">
+                Spotify requires every app, even for personal use, to have a registered developer application. While you can use SpotBack as an individual, you’ll need to create your own free Spotify Developer account and generate your own client ID and secret key.
+              </p>
+              <p className="text-muted-foreground mt-2">
+                This helps ensure security, compliance, and gives you full control over your data and access. {' '}
+                <Link href="/credentials" className="font-medium text-primary hover:underline">
+                    Follow the instructions here to get started.
+                </Link>
+              </p>
+            </div>
           </div>
 
         </div>
