@@ -123,14 +123,14 @@ SPOTIFY_CLIENT_SECRET="YOUR_SPOTIFY_CLIENT_SECRET"
 # For production, it must be the public URL of your deployed app.
 # IMPORTANT: You must add this URL (including the /api/auth/callback/spotify part)
 # to the "Redirect URIs" in your Spotify Developer Dashboard settings.
-NEXT_PUBLIC_APP_URL="http://127.0.0.1:9002"
+NEXT_PUBLIC_APP_URL="https://spotback.website"
 ```
 
 ## Getting Started (Local Development)
 
 1.  **Clone the repository.**
 2.  **Install dependencies:** `npm install`
-3.  **Set up environment variables:** Create a `.env` file and populate it with your credentials as described above.
+3.  **Set up environment variables:** Create a `.env` file and populate it with your credentials as described above. **For local development, change `NEXT_PUBLIC_APP_URL` to `http://127.0.0.1:9002`**.
 4.  **Run the development server:** `npm run dev`
 
 The application will be available at `http://127.0.0.1:9002`.
