@@ -10,8 +10,8 @@ export function Footer() {
             <Image
                 src="/bmc_qr.png"
                 alt="Buy me a coffee QR code"
-                width={100}
-                height={100}
+                width={120}
+                height={120}
                 className="rounded-lg"
                 data-ai-hint="qr code"
             />
