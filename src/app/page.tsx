@@ -3,9 +3,10 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
-import { Music, LogIn } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 import { Dashboard } from '@/components/Dashboard';
 import { Footer } from '@/components/Footer';
 
@@ -53,9 +54,13 @@ function LoginPage() {
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow flex flex-col items-center p-8 text-center pt-10">
         <div className="flex flex-col items-center space-y-6 max-w-lg mx-auto">
-          <div className="bg-primary/20 p-4 rounded-full">
-            <Music className="w-12 h-12 text-primary" />
-          </div>
+          <Image
+            src="/spotify.png"
+            alt="SpotBack Logo"
+            width={64}
+            height={64}
+            data-ai-hint="logo"
+          />
           <h1 className="text-5xl font-bold tracking-tight text-gray-800">
             Spot<span className="text-primary">Back</span>
           </h1>
