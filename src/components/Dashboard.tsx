@@ -22,7 +22,7 @@ import { Footer } from './Footer';
 import { jsonToXml } from '@/lib/utils';
 
 export function Dashboard() {
-  const { accessToken, setUser } = useAuth();
+  const { accessToken, setUser, logout } = useAuth();
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [selectedPlaylists, setSelectedPlaylists] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,10 @@ export function Dashboard() {
   const [backedUpPlaylists, setBackedUpPlaylists] = useState<SpotifyPlaylist[]>([]);
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!accessToken) {
+      setIsLoading(false);
+      return;
+    }
 
     const fetchData = async () => {
       try {
@@ -46,6 +49,11 @@ export function Dashboard() {
         setPlaylists(userPlaylists);
 
       } catch (err: any) {
+        // If the token is invalid or expired, Spotify API will return an error.
+        // Log the user out to force a new authentication flow.
+        if (err.message.includes('401') || err.message.includes('token')) {
+          logout();
+        }
         setError(err.message || 'Failed to fetch data from Spotify.');
       } finally {
         setIsLoading(false);
@@ -53,7 +61,7 @@ export function Dashboard() {
     };
 
     fetchData();
-  }, [accessToken, setUser]);
+  }, [accessToken, setUser, logout]);
 
   const handleSelectAll = (checked: boolean | 'indeterminate') => {
     if (checked === true) {
@@ -93,7 +101,7 @@ export function Dashboard() {
       const dataToDownload = JSON.stringify(backedUpPlaylists, null, 2);
       fileDownload(dataToDownload, `spotify_backup_${timestamp}.json`);
     } else if (format === 'xml') {
-      const xmlData = jsonToXml({ playlist: backedUpPlaylists });
+      const xmlData = jsonToXml({ playlist: backedUp playlists });
       fileDownload(xmlData, `spotify_backup_${timestamp}.xml`);
     } else if (format === 'txt') {
         const urls = backedUpPlaylists
