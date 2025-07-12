@@ -5,38 +5,40 @@ import Image from 'next/image';
 export function Footer() {
   return (
     <footer className="py-6 mt-auto bg-background/50 border-t">
-      <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-        <div className="flex justify-center mb-4">
+      <div className="container mx-auto px-4 text-center text-sm text-muted-foreground flex flex-col items-center">
+        <div className="mb-4">
             <Image
                 src="/bmc_qr.png"
                 alt="Buy me a coffee QR code"
-                width={80}
-                height={80}
+                width={100}
+                height={100}
                 className="rounded-lg"
                 data-ai-hint="qr code"
             />
         </div>
-        <p>
-          &copy; {new Date().getFullYear()} SpotBack. All Rights Reserved.
-        </p>
-        <p className="mt-1">
-          Created with ❤️ by{' '}
-          <a
-            href="https://www.instagram.com/ajbatac"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-primary hover:underline underline-offset-4"
-          >
-            AJ Batac (@ajbatac)
-          </a>{' '}
-          - v0.1{' '}
-          <Link
-            href="/changelog.html"
-            className="font-medium text-primary hover:underline underline-offset-4"
-          >
-            (changelog)
-          </Link>
-        </p>
+        <div>
+            <p>
+            &copy; {new Date().getFullYear()} SpotBack. All Rights Reserved.
+            </p>
+            <p className="mt-1">
+            Created with ❤️ by{' '}
+            <a
+                href="https://www.instagram.com/ajbatac"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-primary hover:underline underline-offset-4"
+            >
+                AJ Batac (@ajbatac)
+            </a>{' '}
+            - v0.1{' '}
+            <Link
+                href="/changelog.html"
+                className="font-medium text-primary hover:underline underline-offset-4"
+            >
+                (changelog)
+            </Link>
+            </p>
+        </div>
       </div>
     </footer>
   );
