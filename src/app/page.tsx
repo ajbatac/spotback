@@ -15,48 +15,32 @@ function LoginPage() {
   const [configError, setConfigError] = useState('');
 
   useEffect(() => {
-    async function fetchConfig() {
-      try {
-        const response = await fetch('/api/config');
-        if (!response.ok) {
-          // Check if the response is JSON before trying to parse it
-          const contentType = response.headers.get('content-type');
-          let errorMsg = `Server responded with status: ${response.status}`;
-          if (contentType && contentType.includes('application/json')) {
-            const config = await response.json();
-            errorMsg = config.error || errorMsg;
-          } else {
-             // If the response is not JSON, it might be a server error page (HTML/text)
-             errorMsg = "An unexpected server error occurred. Please check server logs.";
-          }
-          throw new Error(errorMsg);
-        }
-        const config = await response.json();
-        if (config.error) {
-          throw new Error(config.error);
-        }
-        const { appUrl, clientId } = config;
+    try {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+      const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
 
-        const scopes = [
-          'user-read-private',
-          'user-read-email',
-          'playlist-read-private',
-          'playlist-read-collaborative',
-          'user-top-read',
-        ].join(' ');
-
-        const constructedRedirectUri = `${appUrl}/api/auth/callback/spotify`;
-        const authUrl = new URL('https://accounts.spotify.com/authorize');
-        authUrl.searchParams.append('response_type', 'code');
-        authUrl.searchParams.append('client_id', clientId);
-        authUrl.searchParams.append('scope', scopes);
-        authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
-        setSpotifyAuthUrl(authUrl.toString());
-      } catch (e: any) {
-        setConfigError(e.message || 'An unknown error occurred while fetching config.');
+      if (!appUrl || !clientId) {
+        throw new Error("Missing required configuration. Please check that NEXT_PUBLIC_APP_URL and NEXT_PUBLIC_SPOTIFY_CLIENT_ID are set in your environment.");
       }
+
+      const scopes = [
+        'user-read-private',
+        'user-read-email',
+        'playlist-read-private',
+        'playlist-read-collaborative',
+        'user-top-read',
+      ].join(' ');
+
+      const constructedRedirectUri = `${appUrl}/api/auth/callback/spotify`;
+      const authUrl = new URL('https://accounts.spotify.com/authorize');
+      authUrl.searchParams.append('response_type', 'code');
+      authUrl.searchParams.append('client_id', clientId);
+      authUrl.searchParams.append('scope', scopes);
+      authUrl.searchParams.append('redirect_uri', constructedRedirectUri);
+      setSpotifyAuthUrl(authUrl.toString());
+    } catch (e: any) {
+      setConfigError(e.message || 'An unknown error occurred while preparing the login URL.');
     }
-    fetchConfig();
   }, []);
 
   return (
@@ -115,7 +99,7 @@ function HomePageContent() {
   const { accessToken, setToken } = useAuth();
   const searchParams = useSearchParams();
   const tokenFromUrl = searchParams.get('access_token');
-  const errorFromUrl = searchParams.get('error');
+  const errorFromUrl = asearchParams.get('error');
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
 
