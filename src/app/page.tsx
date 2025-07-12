@@ -43,7 +43,9 @@ function LoginPage() {
           'user-top-read',
         ].join(' ');
 
-        const constructedRedirectUri = `${appUrl}/api/auth/callback/spotify`;
+        const callbackUrl = new URL('/api/auth/callback/spotify', appUrl);
+        const constructedRedirectUri = callbackUrl.toString();
+
         const authUrl = new URL('https://accounts.spotify.com/authorize');
         authUrl.searchParams.append('response_type', 'code');
         authUrl.searchParams.append('client_id', clientId);

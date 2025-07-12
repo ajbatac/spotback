@@ -48,7 +48,8 @@ export async function GET(req: NextRequest) {
     }
   }
   
-  const redirectUri = `${appUrl}/api/auth/callback/spotify`;
+  const callbackUrl = new URL('/api/auth/callback/spotify', appUrl);
+  const redirectUri = callbackUrl.toString();
 
   if (!clientId || !clientSecret) {
     const error_msg = "Missing Spotify credentials. The application now requires you to provide your own API keys.";
