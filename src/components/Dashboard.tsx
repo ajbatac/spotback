@@ -8,7 +8,7 @@ import { PlaylistCard } from '@/components/PlaylistCard';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Loader2, Info } from 'lucide-react';
+import { Loader2, Info, PlusCircle } from 'lucide-react';
 import fileDownload from 'js-file-download';
 
 export function Dashboard() {
@@ -180,16 +180,16 @@ export function Dashboard() {
         </div>
 
         {backupComplete && (
-           <div className="bg-primary/10 border-l-4 border-primary p-6 rounded-lg mb-8 shadow-md">
+           <div className="bg-primary/10 border-l-4 border-primary p-6 rounded-lg mb-8 shadow-md text-center">
              <h2 className="text-2xl font-semibold text-primary mb-3">Backup Complete!</h2>
              <p className="text-muted-foreground mb-4">Your selected playlists have been prepared for download.</p>
-             <div className="flex flex-wrap gap-3">
+             <div className="flex flex-wrap gap-3 justify-center">
               <Button variant="outline" onClick={() => handleDownload('json')}>Download as .JSON</Button>
               <Button variant="outline" onClick={() => handleDownload('xml')}>Download as .XML</Button>
               <Button variant="outline" onClick={() => handleDownload('txt')}>Download as .TXT (Links)</Button>
              </div>
              
-             <div className="mt-6 flex items-start gap-3 bg-background/50 p-4 rounded-md">
+             <div className="mt-6 flex items-start gap-3 bg-background/50 p-4 rounded-md text-left">
                 <Info className="w-5 h-5 mt-1 text-primary flex-shrink-0" />
                 <div>
                     <h3 className="font-semibold text-primary-foreground">What's this for?</h3>
@@ -198,8 +198,17 @@ export function Dashboard() {
                     </p>
                 </div>
              </div>
-
-             <Button variant="link" onClick={() => { setBackupComplete(false); setSelectedPlaylists(new Set()); }} className="mt-4 px-0">Start a new backup</Button>
+             <div className="mt-6">
+                <Button 
+                    variant="success" 
+                    size="lg"
+                    onClick={() => { setBackupComplete(false); setSelectedPlaylists(new Set()); }} 
+                    className="shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+                >
+                    <PlusCircle className="mr-2 h-5 w-5" />
+                    Start a New Backup
+                </Button>
+            </div>
            </div>
         )}
 
