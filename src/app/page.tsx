@@ -60,7 +60,7 @@ function LoginPage() {
             Spot<span className="text-primary">Back</span>
           </h1>
           <p className="text-lg text-muted-foreground">
-            Your personal Spotify assistant. Easily back up your playlists and musical memories in just a few clicks.
+            Your go-to Spotify helper. Backup your playlists and music memories fast — like, literally 3 clicks and you're done.
           </p>
 
           {configError ? (
