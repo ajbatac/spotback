@@ -12,10 +12,43 @@ const ptSans = PT_Sans({
   variable: '--font-sans',
 });
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
+const title = 'SpotBack - The Easiest Way to Backup Your Spotify Playlists';
+const description = 'Never lose your curated music again. SpotBack allows you to securely connect to Spotify and export your playlists to JSON, XML, or TXT in just a few clicks.';
+const imageUrl = `${appUrl}/spotify.png`;
+
 export const metadata: Metadata = {
-  title: 'SpotBack',
-  description: 'Backup Your Spotify Playlist',
+  title: {
+    default: title,
+    template: `%s | SpotBack`,
+  },
+  description: description,
+  keywords: ['Spotify', 'backup', 'playlist', 'export', 'music', 'downloader', 'archive'],
+  openGraph: {
+    title: title,
+    description: description,
+    url: appUrl,
+    siteName: 'SpotBack',
+    images: [
+      {
+        url: imageUrl,
+        width: 64,
+        height: 64,
+        alt: 'SpotBack Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: title,
+    description: description,
+    images: [imageUrl],
+  },
+  metadataBase: new URL(appUrl),
 };
+
 
 const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
