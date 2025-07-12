@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.2.0] - 2024-07-26
+## [0.2.0] - 2024-07-12
 
 ### Added
 - QR code in the footer is now a clickable link to support the creator.
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Corrected page layout to ensure footer sits directly below content, not at the bottom of the viewport.
 - Adjusted login page alignment to position content higher on the screen.
 
-## [0.1.0] - 2024-07-25
+## [0.1.0] - 2024-07-11
 
 ### Added
 - **Initial Release** of SpotBack!
