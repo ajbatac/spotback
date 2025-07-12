@@ -13,9 +13,6 @@ const ptSans = PT_Sans({
 export const metadata: Metadata = {
   title: 'SpotBack',
   description: 'Backup Your Spotify Playlist',
-  icons: {
-    icon: '/favicon.ico',
-  },
 };
 
 export default function RootLayout({
