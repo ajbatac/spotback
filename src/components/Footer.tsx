@@ -1,10 +1,21 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Footer() {
   return (
     <footer className="py-6 mt-auto bg-background/50 border-t">
       <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+        <div className="flex justify-center mb-4">
+            <Image
+                src="/bmc_qr.png"
+                alt="Buy me a coffee QR code"
+                width={80}
+                height={80}
+                className="rounded-lg"
+                data-ai-hint="qr code"
+            />
+        </div>
         <p>
           &copy; {new Date().getFullYear()} SpotBack. All Rights Reserved.
         </p>
