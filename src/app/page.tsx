@@ -131,7 +131,10 @@ function LoginPage() {
               Spotify requires every app, even for personal use, to have a registered developer application. While you can use SpotBack as an individual, you’ll need to create your own free Spotify Developer account and generate your own client ID and secret key.
             </p>
              <p className="text-muted-foreground mt-2">
-              This helps ensure security, compliance, and gives you full control over your data and access.
+              This helps ensure security, compliance, and gives you full control over your data and access. {' '}
+              <Link href="/credentials" className="font-medium text-primary hover:underline">
+                  Follow the instructions here to get started.
+              </Link>
             </p>
           </div>
 
