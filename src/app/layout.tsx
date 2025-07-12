@@ -3,6 +3,7 @@ import { PT_Sans } from 'next/font/google';
 import { AuthProvider } from '@/context/auth-context';
 import './globals.css';
 import { cn } from '@/lib/utils';
+import { Footer } from '@/components/Footer';
 
 const ptSans = PT_Sans({
   subsets: ['latin'],
@@ -22,8 +23,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn('min-h-screen bg-background font-sans antialiased', ptSans.variable)}>
-        <AuthProvider>{children}</AuthProvider>
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased flex flex-col',
+          ptSans.variable
+        )}
+      >
+        <AuthProvider>
+          <div className="flex-grow">{children}</div>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
