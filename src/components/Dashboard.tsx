@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { getPlaylists, getUserProfile } from '@/lib/spotify';
-import type { SpotifyPlaylist } from '@/lib/spotify';
+import type { SpotifyPlaylist, SpotifyUser } from '@/lib/spotify';
 import { Header } from '@/components/Header';
 import { PlaylistCard } from '@/components/PlaylistCard';
 import { Button } from '@/components/ui/button';
@@ -22,8 +22,16 @@ import fileDownload from 'js-file-download';
 import { Footer } from './Footer';
 import { jsonToXml } from '@/lib/utils';
 
+interface DebugInfo {
+  user: string;
+  token: string;
+  call: string;
+  output: string;
+  url: string;
+}
+
 export function Dashboard() {
-  const { accessToken, setUser, logout } = useAuth();
+  const { accessToken, user, setUser, logout } = useAuth();
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [selectedPlaylists, setSelectedPlaylists] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +39,7 @@ export function Dashboard() {
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [backupComplete, setBackupComplete] = useState(false);
   const [backedUpPlaylists, setBackedUpPlaylists] = useState<SpotifyPlaylist[]>([]);
+  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
 
   useEffect(() => {
     if (!accessToken) {
@@ -42,18 +51,33 @@ export function Dashboard() {
       setIsLoading(true);
       setError(null);
       
+      const initialDebugState: DebugInfo = {
+          user: JSON.stringify(user, null, 2),
+          token: accessToken,
+          call: 'Attempting to fetch user profile and playlists...',
+          output: 'Pending...',
+          url: window.location.href
+      };
+      setDebugInfo(initialDebugState);
+
       try {
+        setDebugInfo(prev => ({...prev!, call: 'https://api.spotify.com/v1/me'}));
         const userProfile = await getUserProfile(accessToken);
         setUser(userProfile);
         
+        setDebugInfo(prev => ({...prev!, call: 'https://api.spotify.com/v1/me/playlists', output: `User Profile OK: ${JSON.stringify(userProfile, null, 2)}`}));
         const userPlaylists = await getPlaylists(accessToken);
         setPlaylists(userPlaylists);
+        
+        setDebugInfo(prev => ({...prev!, output: `Playlists OK: ${userPlaylists.length} found.`}));
 
       } catch (err: any) {
         console.error("Failed to fetch data from Spotify:", err);
-        setError(err.message || 'Failed to fetch your data from Spotify. The API might be temporarily down, or your session may have expired.');
-        // Do NOT logout automatically, as that causes the redirect loop.
-        // Let the user decide to log out.
+        const errorMessage = err.message || 'Failed to fetch your data from Spotify. The API might be temporarily down, or your session may have expired.';
+        setError(errorMessage);
+        setDebugInfo(prev => ({...prev!, output: `ERROR: ${errorMessage}`}));
+        // NO LONGER LOGGING OUT AUTOMATICALLY.
+        // logout(); 
       } finally {
         setIsLoading(false);
       }
@@ -109,24 +133,29 @@ export function Dashboard() {
         fileDownload(urls, `spotify_playlist_links_${timestamp}.txt`);
     }
   };
-
-  if (isLoading) {
-    return (
-      <>
-        <Header />
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="ml-2 text-muted-foreground">Loading your playlists...</p>
-        </div>
-        <Footer />
-      </>
-    );
-  }
   
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8 flex-grow">
+        {debugInfo && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-8 font-mono text-xs" role="alert">
+                <h3 className="font-bold text-base mb-2">DEBUG OUTPUT</h3>
+                <p><strong className="w-20 inline-block">URL</strong>: <span className="break-all">{debugInfo.url}</span></p>
+                <p><strong className="w-20 inline-block">User</strong>: <pre className="inline-block bg-yellow-200 p-1 rounded mt-1">{debugInfo.user}</pre></p>
+                <p><strong className="w-20 inline-block">Token</strong>: <span className="break-all">{debugInfo.token}</span></p>
+                <p><strong className="w-20 inline-block">Call</strong>: <span>{debugInfo.call}</span></p>
+                <p><strong className="w-20 inline-block">OUTPUT</strong>: <pre className="whitespace-pre-wrap break-all bg-yellow-200 p-1 rounded mt-1">{debugInfo.output}</pre></p>
+            </div>
+        )}
+
+        {isLoading && (
+            <div className="flex justify-center items-center h-64">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="ml-2 text-muted-foreground">Loading your playlists...</p>
+            </div>
+        )}
+        
         {error && (
             <div className="bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-lg mb-8 flex items-start gap-3">
               <AlertTriangle className="h-5 w-5 flex-shrink-0" />
@@ -138,7 +167,7 @@ export function Dashboard() {
             </div>
         )}
       
-        {!error && (
+        {!error && !isLoading && (
           <>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
               <div>
