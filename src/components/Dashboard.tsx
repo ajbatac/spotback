@@ -108,13 +108,19 @@ export function Dashboard() {
     }, 1500);
   };
 
-  const handleDownload = (format: 'json' | 'xml') => {
+  const handleDownload = (format: 'json' | 'xml' | 'txt') => {
+    const timestamp = new Date().toISOString();
     if (format === 'json') {
       const dataToDownload = JSON.stringify(backedUpPlaylists, null, 2);
-      fileDownload(dataToDownload, `spotify_backup_${new Date().toISOString()}.json`);
+      fileDownload(dataToDownload, `spotify_backup_${timestamp}.json`);
     } else if (format === 'xml') {
       const xmlData = jsonToXml({ playlist: backedUpPlaylists });
-      fileDownload(xmlData, `spotify_backup_${new Date().toISOString()}.xml`);
+      fileDownload(xmlData, `spotify_backup_${timestamp}.xml`);
+    } else if (format === 'txt') {
+        const urls = backedUpPlaylists
+            .map(p => p.external_urls.spotify)
+            .join('\n');
+        fileDownload(urls, `spotify_playlist_links_${timestamp}.txt`);
     }
   };
 
@@ -180,6 +186,7 @@ export function Dashboard() {
              <div className="flex flex-wrap gap-3">
               <Button variant="outline" onClick={() => handleDownload('json')}>Download as .JSON</Button>
               <Button variant="outline" onClick={() => handleDownload('xml')}>Download as .XML</Button>
+              <Button variant="outline" onClick={() => handleDownload('txt')}>Download as .TXT (Links)</Button>
              </div>
              
              <div className="mt-6 flex items-start gap-3 bg-background/50 p-4 rounded-md">
