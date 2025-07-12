@@ -32,7 +32,7 @@ export function Footer() {
             >
                 AJ Batac (@ajbatac)
             </a>{' '}
-            - v0.2{' '}
+            - v1.0.0{' '}
             <Link
                 href="/changelog.html"
                 target="_blank"
