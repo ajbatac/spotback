@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
 import { Music } from 'lucide-react';
+import { Dashboard } from '@/components/Dashboard';
 
 function LoginPage() {
   const [spotifyAuthUrl, setSpotifyAuthUrl] = useState('');
@@ -79,22 +80,6 @@ function LoginPage() {
     </main>
   );
 }
-
-function Dashboard() {
-  const { accessToken, logout } = useAuth();
-  // In the future, we will fetch and display Spotify data here.
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome! You are logged in.</p>
-      <p>
-        <strong>Access Token:</strong> <code style={{ wordBreak: 'break-all' }}>{accessToken}</code>
-      </p>
-      <Button onClick={logout}>Logout</Button>
-    </div>
-  );
-}
-
 
 function HomePageContent() {
   const { accessToken, setToken } = useAuth();
