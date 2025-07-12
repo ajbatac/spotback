@@ -120,6 +120,8 @@ function HomePageContent() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    // This effect runs only on the client, after the initial render.
+    // This safely gates the rendering of components that depend on client-side state.
     setIsClient(true);
   }, []);
   
