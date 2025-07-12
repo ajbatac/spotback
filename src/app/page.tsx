@@ -132,7 +132,7 @@ function HomePageContent() {
   const { accessToken, setToken } = useAuth();
   const searchParams = useSearchParams();
   const tokenFromUrl = searchParams.get('access_token');
-  const errorFromUrl = search_params.get('error');
+  const errorFromUrl = searchParams.get('error');
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
 
