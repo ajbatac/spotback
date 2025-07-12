@@ -8,6 +8,7 @@ import { Footer } from '@/components/Footer';
 import Image from 'next/image';
 import { KeyRound, LogIn, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import Link from 'next/link';
 
 export default function CredentialsPage() {
   const router = useRouter();
@@ -43,13 +44,15 @@ export default function CredentialsPage() {
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow flex flex-col items-center justify-center p-8 text-center">
         <div className="flex flex-col items-center space-y-6 max-w-lg mx-auto">
-          <Image
-            src="/spotify.png"
-            alt="SpotBack Logo"
-            width={64}
-            height={64}
-            data-ai-hint="logo"
-          />
+          <Link href="/">
+            <Image
+              src="/spotify.png"
+              alt="SpotBack Logo"
+              width={64}
+              height={64}
+              data-ai-hint="logo"
+            />
+          </Link>
           <h1 className="text-4xl font-bold tracking-tight text-gray-800">
             Enter Your API Keys
           </h1>
