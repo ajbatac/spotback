@@ -1,14 +1,18 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ListMusic, FileArchive } from 'lucide-react';
-import Image from 'next/image';
+import React from 'react';
 
-const handleLogin = () => {
+// This component now renders a minimal page to demonstrate the Spotify auth flow.
+export default function Home() {
+  // These values MUST be set in your .env file for the authentication to work.
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9002';
+  
+  // This is the specific callback endpoint that will handle the response from Spotify.
+  // It MUST be added to your Spotify application's "Redirect URIs" in the Spotify Developer Dashboard.
   const redirectUri = `${appUrl}/api/auth/callback/spotify`;
+
+  // These are the permissions we are requesting from the user.
   const scopes = [
     'user-read-private',
     'user-read-email',
@@ -17,106 +21,66 @@ const handleLogin = () => {
     'user-top-read',
   ].join(' ');
 
-  if (!clientId) {
-    console.error("Spotify Client ID is not set in environment variables.");
-    // In a real app, you'd want to show a user-friendly error here
-    return;
+  // We construct the full authorization URL.
+  const spotifyAuthUrl = new URL('https://accounts.spotify.com/authorize');
+  
+  if (clientId) {
+    spotifyAuthUrl.searchParams.append('response_type', 'code');
+    spotifyAuthUrl.searchParams.append('client_id', clientId);
+    spotifyAuthUrl.searchParams.append('scope', scopes);
+    spotifyAuthUrl.searchParams.append('redirect_uri', redirectUri);
   }
 
-  const spotifyAuthUrl = new URL('https://accounts.spotify.com/authorize');
-  spotifyAuthUrl.searchParams.append('response_type', 'code');
-  spotifyAuthUrl.searchParams.append('client_id', clientId);
-  spotifyAuthUrl.searchParams.append('scope', scopes);
-  spotifyAuthUrl.searchParams.append('redirect_uri', redirectUri);
-  
-  window.location.href = spotifyAuthUrl.toString();
-};
+  // If the client ID isn't set, we show an error message.
+  if (!clientId) {
+    return (
+      <div>
+        <h1>Error: Spotify Client ID is not configured.</h1>
+        <p>
+          Please make sure you have a <code>.env</code> file in the root of your project
+          and that <code>NEXT_PUBLIC_SPOTIFY_CLIENT_ID</code> is set.
+        </p>
+      </div>
+    );
+  }
 
-export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <header className="container mx-auto px-4 md:px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Image src="/spotify.png" alt="SpotBack Logo" width={40} height={40} />
-          <h1 className="text-2xl font-bold">SpotBack</h1>
-        </div>
-        <Button onClick={handleLogin}>Login with Spotify</Button>
-      </header>
+    <div>
+      <h1>Spotify Barebones Login</h1>
       
-      <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Never Lose a Playlist Again
-                  </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    SpotBack allows you to securely back up your Spotify playlists. Export them in various formats, keep your music safe, and take control of your data.
-                  </p>
-                </div>
-                <div className="w-full max-w-sm space-y-2">
-                  <Button size="lg" className="w-full" onClick={handleLogin}>
-                    Login with Spotify to Get Started
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    We use your Spotify account only to read your playlists. We never store your data.
-                  </p>
-                </div>
-              </div>
-              <div className="flex justify-center">
-                <Image
-                  src="https://placehold.co/600x400.png"
-                  data-ai-hint="music abstract"
-                  width="600"
-                  height="400"
-                  alt="Hero"
-                  className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+      <hr />
 
-        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-secondary">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Key Features</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Your Music, Your Data</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  SpotBack provides all the tools you need to create secure, accessible backups of your musical world.
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-2 mt-12">
-              <Card>
-                <CardHeader>
-                  <ListMusic className="h-8 w-8 mb-2" />
-                  <CardTitle>Comprehensive Backups</CardTitle>
-                  <CardDescription>
-                    Select any or all of your playlists for backup. SpotBack fetches the complete tracklist, including song titles, artists, and albums.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <FileArchive className="h-8 w-8 mb-2" />
-                  <CardTitle>Multiple Export Formats</CardTitle>
-                  <CardDescription>
-                    Export your playlists as simple CSV files, structured JSON, or a convenient ZIP archive containing all selected playlists.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </div>
-          </div>
-        </section>
-      </main>
+      <h2>1. The Call We Will Make</h2>
+      <p>
+        When you click the link below, you will be sent to this URL to ask for your permission:
+      </p>
+      <p>
+        <strong>URL to call:</strong>
+      </p>
+      <pre>
+        <code>{spotifyAuthUrl.toString()}</code>
+      </pre>
+
+      <hr />
+
+      <h2>2. The Return Callback URL</h2>
+      <p>After you approve, Spotify will redirect you back to our server at this specific URL:</p>
+      <p>
+        <strong>Callback URL:</strong>
+      </p>
+      <pre>
+        <code>{redirectUri}</code>
+      </pre>
+      <p><em>(You must add this exact URL to your allowed Redirect URIs in the Spotify Developer Dashboard)</em></p>
       
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">&copy; 2024 SpotBack. All rights reserved.</p>
-      </footer>
+      <hr />
+
+      <h2>3. Initiate Login</h2>
+      <p>
+        <a href={spotifyAuthUrl.toString()}>
+          Login with Spotify
+        </a>
+      </p>
     </div>
   );
 }
