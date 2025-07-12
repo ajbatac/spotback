@@ -6,21 +6,26 @@ export async function GET(req: NextRequest) {
   const code = searchParams.get('code');
   const error = searchParams.get('error');
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9002';
+  const rootUrl = new URL('/', appUrl);
+
   if (error) {
-    return NextResponse.redirect(new URL(`/?error=${encodeURIComponent(error)}`, req.url));
+    rootUrl.searchParams.set('error', error);
+    return NextResponse.redirect(rootUrl);
   }
 
   if (!code) {
-    return NextResponse.redirect(new URL('/?error=Code not found', req.url));
+    rootUrl.searchParams.set('error', 'Code not found in callback');
+    return NextResponse.redirect(rootUrl);
   }
 
-  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9002';
   const redirectUri = `${appUrl}/api/auth/callback/spotify`;
 
   if (!clientId || !clientSecret) {
-    throw new Error('Spotify credentials are not set in the environment variables.');
+    rootUrl.searchParams.set('error', 'Spotify credentials are not set in environment variables');
+    return NextResponse.redirect(rootUrl);
   }
 
   const requestBody = new URLSearchParams({
@@ -43,20 +48,17 @@ export async function GET(req: NextRequest) {
     
     if (!response.ok) {
        const errorDescription = responseData.error_description || 'Failed to fetch access token';
-       return NextResponse.redirect(new URL(`/?error=${encodeURIComponent(errorDescription)}`, req.url));
+       rootUrl.searchParams.set('error', errorDescription);
+       return NextResponse.redirect(rootUrl);
     } 
 
     const accessToken = responseData.access_token;
-    // Redirect to the root of the app URL
-    const redirectURL = new URL('/', appUrl);
-    redirectURL.searchParams.set('access_token', accessToken);
+    rootUrl.searchParams.set('access_token', accessToken);
     
-    return NextResponse.redirect(redirectURL);
+    return NextResponse.redirect(rootUrl);
 
   } catch (e: any) {
-    // Redirect to the root of the app URL with an error
-    const errorURL = new URL('/', appUrl);
-    errorURL.searchParams.set('error', encodeURIComponent(e.message));
-    return NextResponse.redirect(errorURL);
+    rootUrl.searchParams.set('error', e.message || 'An unknown error occurred');
+    return NextResponse.redirect(rootUrl);
   }
 }
