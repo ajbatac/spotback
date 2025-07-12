@@ -4,9 +4,9 @@ import Image from 'next/image';
 
 export function Footer() {
   return (
-    <footer className="pb-6 bg-background/50 border-t">
-      <div className="container mx-auto px-4 text-center text-sm text-muted-foreground flex flex-col items-center">
-        <div className="mb-2">
+    <footer className="bg-background/50 border-t pb-6">
+      <div className="container mx-auto px-4 pt-6 text-center text-sm text-muted-foreground flex flex-col items-center">
+        <div className="mb-4">
             <Image
                 src="/bmc_qr.png"
                 alt="Buy me a coffee QR code"

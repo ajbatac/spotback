@@ -25,12 +25,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          'min-h-screen bg-background font-sans antialiased flex flex-col',
+          'min-h-screen bg-background font-sans antialiased',
           ptSans.variable
         )}
       >
         <AuthProvider>
-          <main className="flex-grow">{children}</main>
+          <main>{children}</main>
           <Footer />
         </AuthProvider>
       </body>
