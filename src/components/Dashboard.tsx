@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { getPlaylists, SpotifyPlaylist, getUserProfile } from '@/lib/spotify';
+import { getPlaylists, getUserProfile } from '@/lib/spotify';
+import type { SpotifyPlaylist } from '@/lib/spotify';
 import { Header } from '@/components/Header';
 import { PlaylistCard } from '@/components/PlaylistCard';
 import { Button } from '@/components/ui/button';

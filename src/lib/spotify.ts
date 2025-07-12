@@ -1,5 +1,6 @@
 import type { Playlist, User } from 'spotify-api';
 
+// Re-exporting the official types with a more friendly name for use in the app
 export type { Playlist as SpotifyPlaylist, User as SpotifyUser };
 
 async function fetchAllPages<T>(initialUrl: string, accessToken: string): Promise<T[]> {
@@ -26,15 +27,14 @@ async function fetchAllPages<T>(initialUrl: string, accessToken: string): Promis
     return items;
 }
 
-export async function getPlaylists(accessToken: string): Promise<Playlist[]> {
+export async function getPlaylists(accessToken: string): Promise<SpotifyPlaylist[]> {
     const initialUrl = 'https://api.spotify.com/v1/me/playlists?limit=50';
     // The spotify-api type for /me/playlists is PagingObject<PlaylistObjectSimplified>
-    // but we are casting to the full Playlist type which is a superset and mostly compatible.
-    // The API returns simplified playlist objects here.
-    return await fetchAllPages<Playlist>(initialUrl, accessToken);
+    // so we cast to SpotifyPlaylist which is compatible for our use case.
+    return await fetchAllPages<SpotifyPlaylist>(initialUrl, accessToken);
 }
 
-export async function getUserProfile(accessToken: string): Promise<User> {
+export async function getUserProfile(accessToken: string): Promise<SpotifyUser> {
     const response = await fetch('https://api.spotify.com/v1/me', {
         headers: {
             Authorization: `Bearer ${accessToken}`,
