@@ -4,31 +4,26 @@
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-// This is now a CLIENT component that receives the appUrl as a prop.
-function HomePageContent({ appUrl }: { appUrl?: string }) {
+function HomePageContent() {
   const searchParams = useSearchParams();
   const accessToken = searchParams.get('access_token');
   const error = searchParams.get('error');
 
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-  // If the app url isn't set (passed from the server component), we must show an error.
-  if (!appUrl) {
+  if (!appUrl || !clientId) {
     return (
       <div>
-        <h1>Error: App URL is not configured.</h1>
+        <h1>Error: Application is not configured correctly.</h1>
         <p>
-          Please make sure the <code>NEXT_PUBLIC_APP_URL</code> environment variable is set.
+          Please ensure <code>NEXT_PUBLIC_APP_URL</code> and <code>NEXT_PUBLIC_SPOTIFY_CLIENT_ID</code> are set.
         </p>
       </div>
     );
   }
 
-  // This is the specific callback endpoint that will handle the response from Spotify.
-  // It MUST be added to your Spotify application's "Redirect URIs" in the Spotify Developer Dashboard.
   const redirectUri = `${appUrl}/api/auth/callback/spotify`;
-
-  // These are the permissions we are requesting from the user.
   const scopes = [
     'user-read-private',
     'user-read-email',
@@ -37,28 +32,11 @@ function HomePageContent({ appUrl }: { appUrl?: string }) {
     'user-top-read',
   ].join(' ');
 
-  // We construct the full authorization URL.
   const spotifyAuthUrl = new URL('https://accounts.spotify.com/authorize');
-
-  if (clientId) {
-    spotifyAuthUrl.searchParams.append('response_type', 'code');
-    spotifyAuthUrl.searchParams.append('client_id', clientId);
-    spotifyAuthUrl.searchParams.append('scope', scopes);
-    spotifyAuthUrl.searchParams.append('redirect_uri', redirectUri);
-  }
-
-  // If the client ID isn't set, we show an error message.
-  if (!clientId) {
-    return (
-      <div>
-        <h1>Error: Spotify Client ID is not configured.</h1>
-        <p>
-          Please make sure you have a <code>.env</code> file in the root of your project
-          and that <code>NEXT_PUBLIC_SPOTIFY_CLIENT_ID</code> is set.
-        </p>
-      </div>
-    );
-  }
+  spotifyAuthUrl.searchParams.append('response_type', 'code');
+  spotifyAuthUrl.searchParams.append('client_id', clientId);
+  spotifyAuthUrl.searchParams.append('scope', scopes);
+  spotifyAuthUrl.searchParams.append('redirect_uri', redirectUri);
 
   if (accessToken) {
     return (
@@ -125,16 +103,10 @@ function HomePageContent({ appUrl }: { appUrl?: string }) {
   );
 }
 
-
-// This is the main export, a SERVER component that wraps the client component.
 export default function Home() {
-    // We can safely read the environment variable here on the server.
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-
-    // We wrap the client component in Suspense to allow it to read search params.
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <HomePageContent appUrl={appUrl} />
+            <HomePageContent />
         </Suspense>
     );
 }

@@ -1,11 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
   typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  env: {
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_SPOTIFY_CLIENT_ID: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
   },
   images: {
     remotePatterns: [
