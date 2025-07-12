@@ -22,16 +22,8 @@ import fileDownload from 'js-file-download';
 import { Footer } from './Footer';
 import { jsonToXml } from '@/lib/utils';
 
-interface DebugInfo {
-  user: string;
-  token: string;
-  call: string;
-  output: string;
-  url: string;
-}
-
 export function Dashboard() {
-  const { accessToken, user, setUser } = useAuth();
+  const { accessToken, setUser } = useAuth();
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [selectedPlaylists, setSelectedPlaylists] = useState<Set<string>>(
     new Set()
@@ -43,7 +35,6 @@ export function Dashboard() {
   const [backedUpPlaylists, setBackedUpPlaylists] = useState<
     SpotifyPlaylist[]
   >([]);
-  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
 
   useEffect(() => {
     if (!accessToken) {
@@ -54,44 +45,30 @@ export function Dashboard() {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-      setDebugInfo({
-        user: 'Fetching...',
-        token: accessToken,
-        call: 'Parallel fetch: /me and /me/playlists',
-        output: 'Pending...',
-        url: window.location.href,
-      });
 
       const [userResult, playlistsResult] = await Promise.allSettled([
         getUserProfile(accessToken),
         getPlaylists(accessToken),
       ]);
 
-      let finalDebugOutput = '';
-
       // Handle user profile result
       if (userResult.status === 'fulfilled') {
         setUser(userResult.value);
-        setDebugInfo(prev => ({...prev!, user: JSON.stringify(userResult.value, null, 2)}));
-        finalDebugOutput += `User Profile: OK\n`;
       } else {
         console.error('Failed to fetch user profile:', userResult.reason);
-        setUser(null);
-        setDebugInfo(prev => ({...prev!, user: 'ERROR'}));
-        finalDebugOutput += `User Profile Error: ${userResult.reason.message}\n`;
+        // We don't set a user-facing error for this, as the app can function without it.
+        // The user's name and image just won't appear in the header.
+        setUser(null); 
       }
 
       // Handle playlists result
       if (playlistsResult.status === 'fulfilled') {
         setPlaylists(playlistsResult.value);
-        finalDebugOutput += `Playlists: OK (${playlistsResult.value.length} found)`;
       } else {
         console.error('Failed to fetch playlists:', playlistsResult.reason);
         setError(playlistsResult.reason.message);
-         finalDebugOutput += `Playlists Error: ${playlistsResult.reason.message}`;
       }
       
-      setDebugInfo(prev => ({...prev!, output: finalDebugOutput}));
       setIsLoading(false);
     };
 
@@ -152,39 +129,6 @@ export function Dashboard() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8 flex-grow">
-        {debugInfo && (
-          <div
-            className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-8 font-mono text-xs"
-            role="alert"
-          >
-            <h3 className="font-bold text-base mb-2">DEBUG OUTPUT</h3>
-            <p>
-              <strong className="w-20 inline-block">URL</strong>:{' '}
-              <span className="break-all">{debugInfo.url}</span>
-            </p>
-            <p>
-              <strong className="w-20 inline-block">User</strong>:{' '}
-              <pre className="inline-block bg-yellow-200 p-1 rounded mt-1">
-                {debugInfo.user}
-              </pre>
-            </p>
-            <p>
-              <strong className="w-20 inline-block">Token</strong>:{' '}
-              <span className="break-all">{debugInfo.token}</span>
-            </p>
-            <p>
-              <strong className="w-20 inline-block">Call</strong>:{' '}
-              <span>{debugInfo.call}</span>
-            </p>
-            <p>
-              <strong className="w-20 inline-block">OUTPUT</strong>:{' '}
-              <pre className="whitespace-pre-wrap break-all bg-yellow-200 p-1 rounded mt-1">
-                {debugInfo.output}
-              </pre>
-            </p>
-          </div>
-        )}
-
         {isLoading && (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
